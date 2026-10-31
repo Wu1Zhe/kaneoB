@@ -1,0 +1,30 @@
+apiVersion: v2
+name: kaneo
+description: "Kaneo: Project management that doesn't become the project."
+type: application
+version: 2.48.0
+appVersion: "2.48.0"
+keywords:
+  - project-management
+  - kanban
+  - task-management
+  - productivity
+  - collaboration
+home: https://kaneo.app
+sources:
+  - https://github.com/usekaneo/kaneo
+icon: https://assets.kaneo.app/logo-text.png
+maintainers:
+  - name: Kaneo Team
+    url: https://github.com/usekaneo
+    email: info@kaneo.app
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/features: |
+    - Fast boards: Board, list, backlog, Gantt, and calendar views
+    - GitHub integration: Issues and pull requests linked to tasks
+    - Self-hosted: Full control over your data
+    - Open Source: MIT licensed
+kubeVersion: ">=1.23.0-0"

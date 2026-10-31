@@ -1,0 +1,44 @@
+# Full-stack Docker Desktop deployment: one container serves the web app and
+# proxies /api to the API, with PostgreSQL in a second container.
+# The image is built from the local source so repo changes are included.
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kaneo}
+      POSTGRES_DB: ${POSTGRES_DB:-kaneo}
+    volumes:
+      - kaneo-main_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kaneo:
+    image: kaneo-local:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.kaneo
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-Y", "off", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5173/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 5
+
+volumes:
+  kaneo-main_postgres_data:
+    external: true
+    name: kaneo-main_postgres_data

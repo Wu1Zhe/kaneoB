@@ -1,0 +1,73 @@
+import { availableSlug } from "../available-slug";
+import { toSlug } from "../to-slug";
+import { publishEvent } from "../../events";
+import { eq, sql } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
+import db from "../../database";
+import { columnTable } from "../../database/schema";
+import { VIRTUAL_STATUSES } from "../../task/validate-task-fields";
+
+async function createColumn({
+  projectId,
+  name,
+  icon,
+  color,
+  isFinal,
+}: {
+  projectId: string;
+  name: string;
+  icon?: string;
+  color?: string;
+  isFinal?: boolean;
+}) {
+  const slug = toSlug(name);
+
+  if (!slug) {
+    throw new HTTPException(400, {
+      message: "Column name must contain at least one alphanumeric character",
+    });
+  }
+
+  if ((VIRTUAL_STATUSES as readonly string[]).includes(slug)) {
+    throw new HTTPException(409, {
+      message: `Column slug "${slug}" is reserved for virtual task statuses`,
+    });
+  }
+
+  const created = await db.transaction(async (tx) => {
+    // Serialize creates per project so concurrent requests cannot pick the
+    // same slug or position.
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(1525, hashtext(${projectId}))`,
+    );
+
+    const columns = await tx
+      .select({ slug: columnTable.slug, position: columnTable.position })
+      .from(columnTable)
+      .where(eq(columnTable.projectId, projectId));
+
+    const [row] = await tx
+      .insert(columnTable)
+      .values({
+        projectId,
+        name,
+        slug: availableSlug(slug, new Set(columns.map((c) => c.slug))),
+        position: Math.max(-1, ...columns.map((c) => c.position)) + 1,
+        icon: icon || null,
+        color: color || null,
+        isFinal: isFinal ?? false,
+      })
+      .returning();
+    return row;
+  });
+
+  if (!created) {
+    throw new HTTPException(500, { message: "Failed to create column" });
+  }
+
+  await publishEvent("project.updated", { projectId: created.projectId });
+
+  return created;
+}
+
+export default createColumn;
