@@ -51,6 +51,18 @@ describe("describeActivity", () => {
     ).toBe("activity:clearedDueDate");
   });
 
+  it("describes progress changes from their event data", () => {
+    expect(
+      describeActivity(
+        activity({
+          type: "progress_changed",
+          eventData: { oldProgress: 20, newProgress: 75 },
+        }),
+        t,
+      ),
+    ).toBe('activity:changedProgress {"from":"20%","to":"75%"}');
+  });
+
   it("uses configured status names and falls back for deleted columns", () => {
     expect(
       describeActivity(

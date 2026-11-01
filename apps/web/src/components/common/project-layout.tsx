@@ -36,6 +36,7 @@ type ProjectLayoutProps = {
   toolbar?: ReactNode;
   summary?: ReactNode;
   filterBar?: ReactNode;
+  insights?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
   activeView?: ProjectRoute;
@@ -47,6 +48,7 @@ export default function ProjectLayout({
   toolbar,
   summary,
   filterBar,
+  insights,
   children,
   showViewSwitcher = true,
   activeView,
@@ -146,33 +148,36 @@ export default function ProjectLayout({
       </Layout.Header>
 
       {unavailableReason ? null : (
-        <TooltipProvider>
-          <div
-            className={cn(
-              "flex h-11 shrink-0 items-center gap-2.5 border-border/80 border-b px-2 sm:px-3",
-              { "bg-card/80 backdrop-blur": !!background },
-            )}
-          >
-            {showViewSwitcher && (
-              <ProjectScopeToggle
-                workspaceId={workspaceId}
-                projectId={projectId}
-                currentView={currentView}
-                onSelect={goToView}
-              />
-            )}
-            {summary}
-            <div className="ml-auto flex shrink-0 items-center gap-1">
-              {toolbar}
+        <>
+          {insights}
+          <TooltipProvider>
+            <div
+              className={cn(
+                "flex h-11 shrink-0 items-center gap-2.5 border-border/80 border-b px-2 sm:px-3",
+                { "bg-card/80 backdrop-blur": !!background },
+              )}
+            >
+              {showViewSwitcher && (
+                <ProjectScopeToggle
+                  workspaceId={workspaceId}
+                  projectId={projectId}
+                  currentView={currentView}
+                  onSelect={goToView}
+                />
+              )}
+              {summary}
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                {toolbar}
+              </div>
             </div>
-          </div>
-          <div className={cn({ "bg-card/80 backdrop-blur": !!background })}>
-            {filterBar}
-          </div>
-        </TooltipProvider>
+            <div className={cn({ "bg-card/80 backdrop-blur": !!background })}>
+              {filterBar}
+            </div>
+          </TooltipProvider>
+        </>
       )}
 
-      <Layout.Content>
+      <Layout.Content style={{ minHeight: "32rem" }}>
         {unavailableReason ? (
           <ProjectUnavailable
             reason={unavailableReason}

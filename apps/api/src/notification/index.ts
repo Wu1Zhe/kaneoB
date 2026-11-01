@@ -13,6 +13,7 @@ import createNotification from "./controllers/create-notification";
 import deleteNotification from "./controllers/delete-notification";
 import getNotifications from "./controllers/get-notifications";
 import markAllNotificationsAsRead from "./controllers/mark-all-notifications-as-read";
+import nudgeTaskAssignee from "./controllers/nudge-task";
 import setNotificationRead from "./controllers/set-notification-read";
 import {
   bulkResultSchema,
@@ -23,6 +24,7 @@ import {
   createNotificationBody,
   notificationParam,
   notificationWorkspaceQuery,
+  nudgeTaskBody,
 } from "./schema";
 
 const listNotificationsRoute = createRoute({
@@ -149,6 +151,31 @@ const deleteNotificationRoute = createRoute({
   },
 });
 
+const nudgeTaskRoute = createRoute({
+  method: "post",
+  operationId: "nudgeTaskAssignee",
+  path: "/nudge",
+  tags: ["Notifications"],
+  summary: "Nudge a task assignee",
+  description:
+    "Send an in-app reminder to the assignee of a task. The caller must be able to read tasks in the task's workspace. Returns null when the task has no assignee or the caller is the assignee.",
+  request: {
+    body: {
+      required: true,
+      content: { "application/json": { schema: nudgeTaskBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse(
+      "The reminder notification, or null when there is nobody to remind",
+      notificationSchema.nullable(),
+    ),
+    400: errorResponse("Invalid request"),
+    403: errorResponse("No access to the task"),
+    404: errorResponse("Task not found"),
+  },
+});
+
 const notification = apiRouter()
   .openapi(listNotificationsRoute, async (c) =>
     c.json(
@@ -182,6 +209,12 @@ const notification = apiRouter()
       200,
     );
   })
+  .openapi(nudgeTaskRoute, async (c) =>
+    c.json(
+      await nudgeTaskAssignee(c, c.req.valid("json").taskId, c.get("userId")),
+      200,
+    ),
+  )
   .openapi(markAsReadRoute, async (c) =>
     c.json(
       await setNotificationRead(

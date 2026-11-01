@@ -309,6 +309,20 @@ subscribeToEvent<{
 subscribeToEvent<{
   taskId: string;
   userId: string;
+  oldProgress: number;
+  newProgress: number;
+  title: string;
+  type: string;
+}>("task.progress_changed", async (data) => {
+  await createActivity(data.taskId, data.type, data.userId, null, {
+    oldProgress: data.oldProgress,
+    newProgress: data.newProgress,
+  });
+});
+
+subscribeToEvent<{
+  taskId: string;
+  userId: string;
   title: string;
   type: string;
 }>("task.unassigned", async (data) => {

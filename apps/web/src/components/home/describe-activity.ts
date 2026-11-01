@@ -56,6 +56,14 @@ export function describeActivity(activity: WorkspaceActivity, t: Translate) {
         });
       }
       break;
+    case "progress_changed":
+      if (eventData) {
+        return t("activity:changedProgress", {
+          from: `${Number(eventData.oldProgress ?? 0)}%`,
+          to: `${Number(eventData.newProgress ?? 0)}%`,
+        });
+      }
+      break;
     case "assignee_changed":
       if (eventData) {
         return eventData.isSelfAssigned

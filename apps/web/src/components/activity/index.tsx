@@ -1,4 +1,4 @@
-import { Calendar, CircleAlert, History, UserRound } from "lucide-react";
+import { Calendar, CircleAlert, Gauge, History, UserRound } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import useGetWorkspaceUsers from "@/hooks/queries/workspace-users/use-get-workspace-users";
@@ -57,6 +57,8 @@ function getActivityTypeIcon(type: string) {
       return <CircleAlert className={iconClass} />;
     case "due_date_changed":
       return <Calendar className={iconClass} />;
+    case "progress_changed":
+      return <Gauge className={iconClass} />;
     case "assignee_changed":
     case "unassigned":
       return <UserRound className={iconClass} />;
@@ -200,6 +202,21 @@ function renderActivityContent({
         })}
       </span>
     );
+  }
+
+  if (activity.type === "progress_changed") {
+    if (eventData) {
+      return (
+        <span className="text-muted-foreground">
+          {t("activity:changedProgress", {
+            from: `${Number(eventData.oldProgress ?? 0)}%`,
+            to: `${Number(eventData.newProgress ?? 0)}%`,
+          })}
+        </span>
+      );
+    }
+
+    return <span className="text-muted-foreground">{content}</span>;
   }
 
   if (activity.type === "status_changed") {

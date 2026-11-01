@@ -3042,6 +3042,10 @@
         "title": "已开始计时",
         "contentWithTask": "已开始为任务 {{taskTitle}} 计时",
         "contentWithoutTask": "已开始为某个任务计时"
+      },
+      "task_nudge": {
+        "title": "{{nudgerName}} 催办了你",
+        "content": "{{nudgerName}} 提醒你关注任务：{{taskTitle}}"
       }
     },
     "inbox": {
@@ -3077,6 +3081,7 @@
     "setDueDate": "将截止日期设为 {{date}}",
     "changedDueDate": "将截止日期从 {{from}} 改为 {{to}}",
     "changedTitle": "将标题从 \"{{from}}\" 改为 \"{{to}}\"",
+    "changedProgress": "将进度从 {{from}} 改为 {{to}}",
     "moved": "将任务从 \"{{from}}\" 移动到 \"{{to}}\"",
     "created": "创建了此任务",
     "githubUser": "GitHub 用户",
@@ -3787,6 +3792,46 @@
       "startsOn": "开始于 {{date}}",
       "beforeStart": "{{date}} 早于开始日期",
       "afterDue": "{{date}} 晚于截止日期"
+    },
+    "insights": {
+      "overdueTitle": "超时任务预警",
+      "tabOverdue": "已超时",
+      "tabDueSoon": "即将超时",
+      "overdueFor": "逾期 {{duration}}",
+      "dueIn": "剩余 {{duration}}",
+      "nudge": "催办",
+      "nudgeSent": "已催办 {{name}}",
+      "nudgeNoAssignee": "未发送提醒：任务暂无负责人，或对方已关闭到期提醒。",
+      "nudgeFailed": "催办失败",
+      "changeDueDate": "修改时间",
+      "unassigned": "未分配",
+      "emptyOverdueTitle": "没有超时任务",
+      "emptyOverdueDescription": "目前没有任务超过计划完成时间。",
+      "emptyDueSoonTitle": "暂无即将超时任务",
+      "emptyDueSoonDescription": "未来 24 小时内没有需要关注的任务。",
+      "moreCount": "还有 {{count}} 条",
+      "durationMinutes_other": "{{count}} 分钟",
+      "durationHours_other": "{{count}} 小时",
+      "durationDays_other": "{{count}} 天",
+      "durationDaysHours": "{{days}} 天 {{hours}} 小时",
+      "durationWeeks_other": "{{count}} 周",
+      "statsTitle": "数据统计",
+      "tabPeople": "按人看",
+      "tabTasks": "按事看",
+      "person": "负责人",
+      "total": "合计",
+      "taskColumn": "任务",
+      "emptyStats": "当前视图暂无任务。",
+      "statusDistribution": "任务状态分布",
+      "trendTitle": "任务趋势",
+      "range7": "近 7 天",
+      "range30": "近 30 天",
+      "created": "新增",
+      "completed": "完成",
+      "date": "日期",
+      "kpiTotal": "总任务数",
+      "kpiCompletion": "整体完成率",
+      "kpiOverdue": "超时率"
     }
   },
   "invitations": {

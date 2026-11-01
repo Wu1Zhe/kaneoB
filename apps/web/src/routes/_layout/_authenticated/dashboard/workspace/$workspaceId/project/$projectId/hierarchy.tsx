@@ -6,6 +6,7 @@ import { HierarchyView } from "@/components/hierarchy-view";
 import PageTitle from "@/components/page-title";
 import { DisplaySection } from "@/components/project/display/display-section";
 import { ActiveFiltersBar } from "@/components/project/task-filters/active-filters-bar";
+import { ProjectInsightsBar } from "@/components/project/insights";
 import { ProjectToolbar } from "@/components/project/toolbar/project-toolbar";
 import { TaskCount } from "@/components/project/toolbar/task-count";
 import { useProjectTaskView } from "@/components/project/toolbar/use-project-task-view";
@@ -23,9 +24,7 @@ export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/hierarchy",
 )({
   component: RouteComponent,
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): HierarchySearchParams => ({
+  validateSearch: (search: Record<string, unknown>): HierarchySearchParams => ({
     taskId: typeof search.taskId === "string" ? search.taskId : undefined,
   }),
 });
@@ -35,12 +34,7 @@ function RouteComponent() {
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
-  const {
-    data: project,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetTasks(projectId);
+  const { data: project, isLoading, isError, refetch } = useGetTasks(projectId);
   const view = useProjectTaskView({
     project,
     projectId,
@@ -68,6 +62,11 @@ function RouteComponent() {
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="hierarchy"
+      insights={
+        project ? (
+          <ProjectInsightsBar project={filteredProject ?? project} />
+        ) : null
+      }
       toolbar={
         <ProjectToolbar
           view={view}
@@ -111,7 +110,10 @@ function RouteComponent() {
         ) : isError ? (
           <div className="flex flex-1 items-center justify-center px-6">
             <div className="max-w-sm text-center">
-              <p role="alert" className="text-sm font-semibold text-destructive">
+              <p
+                role="alert"
+                className="text-sm font-semibold text-destructive"
+              >
                 {t("tasks:calendar.loadError")}
               </p>
               <Button

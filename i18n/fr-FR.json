@@ -3138,6 +3138,10 @@
 			"task_overdue": {
 				"title": "Tâche en retard",
 				"content": "{{taskTitle}} a dépassé sa date d'échéance"
+			},
+			"task_nudge": {
+				"content": "{{nudgerName}} asked you to look at: {{taskTitle}}",
+				"title": "{{nudgerName}} is nudging you"
 			}
 		},
 		"reminderLeadTime": {
@@ -3287,7 +3291,8 @@
 			"importedBy": "Importé par {{name}}",
 			"commentedOnForge": "a commenté sur {{forge}}"
 		},
-		"movedFromOtherProject": "a déplacé la tâche depuis un autre projet vers « {{to}} »"
+		"movedFromOtherProject": "a déplacé la tâche depuis un autre projet vers « {{to}} »",
+		"changedProgress": "changed progress from {{from}} to {{to}}"
 	},
 	"tasks": {
 		"title": "Tâches",
@@ -3931,6 +3936,54 @@
 			"noTasksSubtitle": "Create tasks and link subtasks to see your work as a hierarchy.",
 			"pageTitle": "{{name}} / Hierarchy",
 			"title": "Task hierarchy"
+		},
+		"insights": {
+			"changeDueDate": "Change due date",
+			"completed": "Completed",
+			"created": "Created",
+			"date": "Date",
+			"dueIn": "Due in {{duration}}",
+			"durationDays_many": "{{count}}d",
+			"durationDays_one": "{{count}}d",
+			"durationDays_other": "{{count}}d",
+			"durationDaysHours": "{{days}}d {{hours}}h",
+			"durationHours_many": "{{count}}h",
+			"durationHours_one": "{{count}}h",
+			"durationHours_other": "{{count}}h",
+			"durationMinutes_many": "{{count}}m",
+			"durationMinutes_one": "{{count}}m",
+			"durationMinutes_other": "{{count}}m",
+			"durationWeeks_many": "{{count}}w",
+			"durationWeeks_one": "{{count}}w",
+			"durationWeeks_other": "{{count}}w",
+			"emptyDueSoonDescription": "No task needs attention in the next 24 hours.",
+			"emptyDueSoonTitle": "Nothing due within 24h",
+			"emptyOverdueDescription": "Nothing has slipped past its due date.",
+			"emptyOverdueTitle": "No overdue tasks",
+			"emptyStats": "No tasks in this view yet.",
+			"kpiCompletion": "Completion rate",
+			"kpiOverdue": "Overdue rate",
+			"kpiTotal": "Total tasks",
+			"moreCount": "+{{count}} more",
+			"nudge": "Nudge",
+			"nudgeFailed": "Could not send the nudge",
+			"nudgeNoAssignee": "This task has no assignee to nudge.",
+			"nudgeSent": "Nudge sent to {{name}}",
+			"overdueFor": "{{duration}} overdue",
+			"overdueTitle": "Overdue alerts",
+			"person": "Assignee",
+			"range30": "30d",
+			"range7": "7d",
+			"statsTitle": "Task statistics",
+			"statusDistribution": "Status distribution",
+			"tabDueSoon": "Due within 24h",
+			"tabOverdue": "Overdue",
+			"tabPeople": "By person",
+			"tabTasks": "By task",
+			"total": "Total",
+			"trendTitle": "Task trend",
+			"unassigned": "Unassigned",
+			"taskColumn": "Tasks"
 		}
 	},
 	"invitations": {

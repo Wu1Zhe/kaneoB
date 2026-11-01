@@ -57,6 +57,9 @@ vi.mock("@/components/project/toolbar/use-project-task-view", () => ({
 vi.mock("@/components/common/project-layout", () => ({
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
+vi.mock("@/components/project/insights", () => ({
+  ProjectInsightsBar: () => null,
+}));
 vi.mock("@/components/kanban-board", () => ({
   default: ({ disableDragDrop }: { disableDragDrop: boolean }) => (
     <div aria-label="Cached board" data-drag-disabled={disableDragDrop}>

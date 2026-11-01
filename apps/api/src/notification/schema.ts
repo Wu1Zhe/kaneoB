@@ -9,6 +9,12 @@ export const notificationWorkspaceQuery = z.object({
 
 export const notificationParam = z.object({ id: z.string() });
 
+export const nudgeTaskBody = z.object({
+  taskId: z.string().min(1).openapi({
+    description: "The task whose assignee should receive the reminder.",
+  }),
+});
+
 export const createNotificationBody = z.object({
   title: z.string().nullable().optional(),
   message: z.string().nullable().optional().openapi({

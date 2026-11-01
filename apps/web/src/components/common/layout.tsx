@@ -22,6 +22,7 @@ type HeaderProps = {
 type ContentProps = {
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 function LayoutHeader({ children, className }: HeaderProps) {
@@ -37,9 +38,9 @@ function LayoutHeader({ children, className }: HeaderProps) {
   );
 }
 
-function LayoutContent({ children, className }: ContentProps) {
+function LayoutContent({ children, className, style }: ContentProps) {
   return (
-    <div className={cn("flex-1 min-h-0", className)}>
+    <div className={cn("flex-1 min-h-0", className)} style={style}>
       <div className="h-full">{children}</div>
     </div>
   );

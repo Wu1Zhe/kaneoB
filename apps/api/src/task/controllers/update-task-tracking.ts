@@ -92,6 +92,16 @@ async function updateTaskTracking({
   const progressChanged =
     existingTask.progress !== updatedTask.progress ||
     existingTask.weight !== updatedTask.weight;
+  if (existingTask.progress !== updatedTask.progress)
+    await publishEvent("task.progress_changed", {
+      taskId: updatedTask.id,
+      projectId: updatedTask.projectId,
+      userId: currentUserId,
+      title: updatedTask.title,
+      oldProgress: existingTask.progress,
+      newProgress: updatedTask.progress,
+      type: "progress_changed",
+    });
   if (progressChanged)
     await publishEvent("subtask-parents.refresh", {
       projects: await getSubtaskParentProjects([updatedTask.id]),

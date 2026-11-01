@@ -133,6 +133,7 @@ export const boardTaskSchema = z
     recurrence: z.union([taskRecurrenceSchema, z.null()]),
     position: z.number().nullable(),
     createdAt: responseTimestamp,
+    updatedAt: responseTimestamp,
     userId: z.string().nullable(),
     assigneeName: z.string().nullable(),
     assigneeId: z.string().nullable(),

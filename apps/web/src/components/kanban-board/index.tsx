@@ -349,11 +349,11 @@ function KanbanBoard({
             activeId === null && "snap-x snap-mandatory sm:snap-none",
           )}
         >
-          <div className="flex h-full min-w-max gap-4 px-4 py-4 md:px-5">
+          <div className="flex h-full w-full gap-3 px-3 py-3 md:px-4">
             {(dragPreview.preview ?? queuedProject).columns.map((column) => (
               <div
                 key={column.id}
-                className="h-full max-w-96 min-w-[min(20rem,calc(100vw-4.5rem))] shrink-0 flex-1 snap-start"
+                className="h-full min-w-[10.5rem] flex-1 basis-0 snap-start"
               >
                 <Column
                   column={column}

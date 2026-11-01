@@ -1,6 +1,7 @@
 import {
   AtSign,
   Bell,
+  BellRing,
   CalendarClock,
   CalendarX,
   History,
@@ -20,6 +21,7 @@ const icons: Record<string, LucideIcon> = {
   task_created: SquarePlus,
   due_date_reminder: CalendarClock,
   task_overdue: CalendarX,
+  task_nudge: BellRing,
   time_entry_created: Timer,
 };
 

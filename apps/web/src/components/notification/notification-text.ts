@@ -81,6 +81,11 @@ export function getNotificationTitle(
           ...eventData,
           defaultValue: notification.title ?? notification.type,
         });
+      case "task_nudge":
+        return t("notifications:events.task_nudge.title", {
+          ...eventData,
+          defaultValue: notification.title ?? notification.type,
+        });
       default:
         break;
     }
@@ -146,6 +151,11 @@ export function getNotificationContent(
         });
       case "task_overdue":
         return t("notifications:events.task_overdue.content", {
+          ...eventData,
+          defaultValue: notification.content ?? "",
+        });
+      case "task_nudge":
+        return t("notifications:events.task_nudge.content", {
           ...eventData,
           defaultValue: notification.content ?? "",
         });

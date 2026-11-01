@@ -8,12 +8,7 @@ export function isWeekStartDay(value: number): value is WeekStartDay {
   return WEEK_START_DAYS.some((day) => day === value);
 }
 
-export type TaskLayout =
-  | "board"
-  | "list"
-  | "calendar"
-  | "gantt"
-  | "hierarchy";
+export type TaskLayout = "board" | "list" | "calendar" | "gantt" | "hierarchy";
 
 export type PriorityIconStyle = "marks" | "classic";
 
@@ -169,12 +164,12 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
     {
       name: "user-preferences",
       storage: createJSONStorage(() => localStorage),
-      // Hierarchy became the default view. Anyone still on the old default
-      // (board) moves over; an explicit list/calendar/gantt choice is kept.
-      version: 1,
+      // Hierarchy is the default view. Anyone still on the old board default
+      // moves over; an explicit list/calendar/gantt choice is kept.
+      version: 3,
       migrate: (persistedState, version) => {
         const state = persistedState as Partial<UserPreferencesStore>;
-        if (version < 1 && state?.taskLayout === "board")
+        if (version < 3 && state?.taskLayout === "board")
           return { ...state, taskLayout: "hierarchy" } as UserPreferencesStore;
         return state as UserPreferencesStore;
       },

@@ -45,7 +45,9 @@ export async function persistNotification(
         ? "taskCommentEnabled"
         : type === "task_status_changed"
           ? "taskStatusChangeEnabled"
-          : type === "due_date_reminder" || type === "task_overdue"
+          : type === "due_date_reminder" ||
+              type === "task_overdue" ||
+              type === "task_nudge"
             ? "dueDateReminderEnabled"
             : null;
 
