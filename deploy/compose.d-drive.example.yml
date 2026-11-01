@@ -1,0 +1,50 @@
+# Copy this file to ../kaneoB-data/compose.yml before running it.
+# Relative paths below are resolved from the deployed compose.yml directory.
+name: kaneob-local
+
+x-logging: &logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in the deployment .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in the deployment .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the deployment .env}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  kaneo:
+    image: kaneob-local:latest
+    build:
+      context: ../kaneoB
+      dockerfile: Dockerfile.kaneo
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5173:5173"
+    volumes:
+      - ./runtime:/var/lib/kaneo
+      - ./api-data:/app/apps/api/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "wget", "-Y", "off", "--quiet", "--spider", "http://127.0.0.1:5173/api/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 12
