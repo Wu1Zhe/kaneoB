@@ -1,10 +1,10 @@
 import { BarChart3 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { ProjectWithTasks } from "@/types/project";
+import type { InsightProject } from "./insights-data";
 import { buildStatusColorMap } from "./insight-colors";
 import {
   buildStatusCounts,
@@ -15,6 +15,7 @@ import {
 } from "./insights-data";
 import { StatusDonut } from "./status-donut";
 import { TrendChart } from "./trend-chart";
+import { useInsightsView } from "./use-insights-view";
 
 function KpiTile({ label, value }: { label: string; value: string }) {
   return (
@@ -27,9 +28,9 @@ function KpiTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-function TaskDimension({ project }: { project: ProjectWithTasks }) {
+function TaskDimension({ project }: { project: InsightProject }) {
   const { t } = useTranslation();
-  const [days, setDays] = useState<7 | 30>(7);
+  const [days, setDays] = useInsightsView("days");
   const columns = useMemo(() => getInsightColumns(project), [project]);
   const tasks = useMemo(() => collectInsightTasks(project), [project]);
   const colors = useMemo(() => buildStatusColorMap(columns), [columns]);
@@ -110,9 +111,22 @@ function TaskDimension({ project }: { project: ProjectWithTasks }) {
   );
 }
 
-export function TaskInsightsPanel({ project }: { project: ProjectWithTasks }) {
+export function TaskInsightsPanel({
+  project,
+  embedded = false,
+}: {
+  project: InsightProject;
+  embedded?: boolean;
+}) {
   const { t } = useTranslation();
   const total = useMemo(() => collectInsightTasks(project).length, [project]);
+
+  if (embedded)
+    return (
+      <div className="px-3 pb-3">
+        <TaskDimension project={project} />
+      </div>
+    );
 
   return (
     <Card className="flex flex-col overflow-hidden">

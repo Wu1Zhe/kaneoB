@@ -195,6 +195,12 @@ export function useProjectWebSocket(projectId: string) {
         if (disposed || activeSocket !== ws) return;
         try {
           const message = JSON.parse(event.data);
+          if (message.type === "ACTIVITY_CREATED") {
+            void queryClient.invalidateQueries({
+              queryKey: ["project-changes", projectId],
+            });
+            return;
+          }
           if (message.type === "PROJECT_MEMBERS_UPDATED") {
             void queryClient.invalidateQueries({
               predicate: (query) =>
@@ -267,6 +273,15 @@ export function useProjectWebSocket(projectId: string) {
             queryClient.invalidateQueries({
               queryKey: ["integration-sync-preview", projectId],
             });
+          }
+          if (message.type === "IDEAS_UPDATED") {
+            queryClient.invalidateQueries({
+              queryKey: ["project-ideas", projectId],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["project-idea", projectId],
+            });
+            return;
           }
           if (message.type === "PROJECT_MOVED") {
             markBoardCacheChanged(queryClient, projectId);
@@ -659,6 +674,15 @@ export function useProjectWebSocket(projectId: string) {
           return;
         if (needsReconcile) {
           needsReconcile = false;
+          void queryClient.invalidateQueries({
+            queryKey: ["project-ideas", projectId],
+          });
+          void queryClient.invalidateQueries({
+            queryKey: ["project-idea", projectId],
+          });
+          void queryClient.invalidateQueries({
+            queryKey: ["project-changes", projectId],
+          });
           markBoardCacheChanged(queryClient, projectId);
           void queryClient.invalidateQueries({
             queryKey: ["tasks", projectId],

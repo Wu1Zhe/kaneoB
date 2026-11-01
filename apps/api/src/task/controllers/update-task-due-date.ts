@@ -1,7 +1,8 @@
+import { normalizeRequirementData } from "../requirement-rules";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable } from "../../database/schema";
+import { taskTable, projectTable } from "../../database/schema";
 import {
   publishTaskMutation,
   recordTaskMutation,
@@ -34,6 +35,13 @@ async function updateTaskDueDate({
       .for("update");
     if (!locked) throw new HTTPException(404, { message: "Task not found" });
     existingTask = locked;
+    const container = await tx.query.projectTable.findFirst({
+      where: eq(projectTable.id, locked.projectId),
+    });
+    if (container?.kind === "requirement")
+      normalizeRequirementData({
+        prodPlannedAt: dueDate?.toISOString() ?? null,
+      });
 
     const [task] = await tx
       .update(taskTable)

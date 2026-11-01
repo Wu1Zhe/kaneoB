@@ -28,7 +28,13 @@ export default function ProjectCrumbSelect({
   onAddProject,
 }: ProjectCrumbSelectProps) {
   const { t } = useTranslation();
-  const { data: projects = [] } = useGetProjects({ workspaceId });
+  const { data: allProjects = [] } = useGetProjects({ workspaceId });
+  const kind =
+    allProjects.find((project) => project.id === projectId)?.kind ?? "project";
+  const projects = allProjects.filter(
+    (project) => (project.kind ?? "project") === kind,
+  );
+  const isRequirement = kind === "requirement";
 
   return (
     <DropdownMenu>
@@ -49,7 +55,11 @@ export default function ProjectCrumbSelect({
       <DropdownMenuContent className="w-72" align="start">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-[11px] uppercase tracking-wide">
-            {t("navigation:sidebar.projects")}
+            {t(
+              isRequirement
+                ? "requirements:title"
+                : "navigation:sidebar.projects",
+            )}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -72,7 +82,11 @@ export default function ProjectCrumbSelect({
               disabled
               className="h-8 text-sm text-muted-foreground"
             >
-              {t("settings:projectSwitcher.noProjects")}
+              {t(
+                isRequirement
+                  ? "requirements:empty"
+                  : "settings:projectSwitcher.noProjects",
+              )}
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
@@ -83,7 +97,11 @@ export default function ProjectCrumbSelect({
             className="h-8 gap-2 text-sm"
           >
             <Plus className="size-3.5" />
-            {t("navigation:projectList.addProject")}
+            {t(
+              isRequirement
+                ? "requirements:add"
+                : "navigation:projectList.addProject",
+            )}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

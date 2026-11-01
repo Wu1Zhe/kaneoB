@@ -11,7 +11,10 @@ export function TaskProgressBadges({
   task,
   asText = false,
 }: {
-  task: Pick<Task, "description" | "descriptionDeferred" | "subtaskCounts">;
+  task: Pick<
+    Task,
+    "description" | "descriptionDeferred" | "subtaskCounts" | "projectKind"
+  >;
   asText?: boolean;
 }) {
   const { t } = useTranslation();
@@ -26,7 +29,8 @@ export function TaskProgressBadges({
   const counters = [
     {
       kind: "subtasks",
-      counts: task.subtaskCounts,
+      counts:
+        task.projectKind === "requirement" ? undefined : task.subtaskCounts,
       Icon: ListTree,
       label: t("tasks:subtasks.progress", {
         completed: task.subtaskCounts?.completed ?? 0,

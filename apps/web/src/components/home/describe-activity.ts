@@ -1,5 +1,6 @@
+import { describeRequirementChange } from "@/components/requirement/describe-requirement-change";
 import type { WorkspaceActivity } from "@/fetchers/activity/get-workspace-activities";
-import { formatDateMedium } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import { getPriorityLabel, getStatusDisplayLabel } from "@/lib/i18n/domain";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
@@ -14,13 +15,15 @@ function eventDataOf(activity: WorkspaceActivity) {
 
 function formatEventDate(value: unknown) {
   const date = new Date(String(value));
-  return Number.isNaN(date.getTime()) ? String(value) : formatDateMedium(date);
+  return Number.isNaN(date.getTime()) ? String(value) : formatDateTime(date);
 }
 
 // What the actor did, phrased to follow their name: "Mira <changed status…>".
 export function describeActivity(activity: WorkspaceActivity, t: Translate) {
   const eventData = eventDataOf(activity);
 
+  if (activity.type.startsWith("requirement_") && eventData)
+    return describeRequirementChange(eventData, t);
   switch (activity.type) {
     case "comment":
       return t("workspace:home.activity.commented");

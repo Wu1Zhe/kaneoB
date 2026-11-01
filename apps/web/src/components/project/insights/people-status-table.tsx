@@ -9,16 +9,23 @@ export function PeopleStatusTable({
   rows,
   columns,
   colors,
+  workspaceId,
 }: {
   rows: PersonStatusRow[];
   columns: InsightColumn[];
   colors: Record<string, string>;
+  workspaceId?: string;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const openTask = (taskId: string) => {
-    navigate({ to: ".", search: { taskId }, replace: true });
+  const openTask = (taskId: string, projectId: string) => {
+    if (workspaceId)
+      navigate({
+        to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId",
+        params: { workspaceId, projectId, taskId },
+      });
+    else navigate({ to: ".", search: { taskId }, replace: true });
   };
 
   return (
@@ -99,7 +106,7 @@ export function PeopleStatusTable({
                         key={task.id}
                         type="button"
                         title={task.title}
-                        onClick={() => openTask(task.id)}
+                        onClick={() => openTask(task.id, task.projectId)}
                         className="max-w-40 truncate rounded-full border border-border/60 bg-background px-2 py-0.5 text-[10px] text-foreground/80 transition-colors hover:border-primary/40 hover:bg-accent hover:text-foreground"
                       >
                         {task.title}

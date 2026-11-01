@@ -7,10 +7,7 @@ function task(progress?: number | null, weight?: number | null) {
 
 describe("buildProgressMap", () => {
   it("keeps a leaf's own progress", () => {
-    const map = buildProgressMap(
-      new Map([["a", task(40)]]),
-      new Map(),
-    );
+    const map = buildProgressMap(new Map([["a", task(40)]]), new Map());
     expect(map.get("a")).toBe(40);
   });
 

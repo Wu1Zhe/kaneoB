@@ -9,10 +9,7 @@ function children(entries: Array<[string, string[]]>): Map<string, string[]> {
 
 it("keeps only tasks without a visible parent as roots", () => {
   const tasks: Node[] = [{ id: "parent" }, { id: "child" }, { id: "other" }];
-  const roots = buildHierarchyRoots(
-    tasks,
-    children([["parent", ["child"]]]),
-  );
+  const roots = buildHierarchyRoots(tasks, children([["parent", ["child"]]]));
 
   expect(roots.map((task) => task.id)).toEqual(["parent", "other"]);
 });

@@ -23,6 +23,8 @@ type TaskCustomFieldValue = {
 };
 
 type Task = {
+  projectKind?: "project" | "requirement";
+  requirementData?: Record<string, string | null> | null;
   id: string;
   title: string;
   number: number | null;
@@ -33,6 +35,8 @@ type Task = {
   progress?: number;
   weight?: number;
   createdBy?: string | null;
+  updatedBy?: string | null;
+  updaterName?: string | null;
   creatorName?: string | null;
   creatorImage?: string | null;
   startDate: string | null;

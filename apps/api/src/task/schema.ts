@@ -1,3 +1,4 @@
+import { requirementDataSchema } from "./requirement-fields";
 import { pagingNumber, z } from "../openapi";
 import { MAX_TASK_POSITION } from "./controllers/next-task-position";
 import { taskRecurrenceSchema } from "./recurrence/schema";
@@ -31,11 +32,19 @@ export const ticketIdQuery = z.object({
 export const projectIdParam = z.object({ projectId: z.string() });
 
 export const assignedTasksQuery = z.object({
+  kind: z.enum(["project", "requirement"]).optional(),
   workspaceId: z.string().min(1),
   countOnly: z.enum(["true", "false"]).optional().openapi({
     description:
       "Return only the total, with an empty tasks array, without loading task rows or labels.",
   }),
+});
+
+export const personalInsightTasksQuery = z.object({
+  kind: z.enum(["project", "requirement"]).optional(),
+  workspaceId: z.string().min(1),
+  after: z.string().min(1).max(128).optional(),
+  limit: pagingNumber(1, 100).default(100),
 });
 
 const priority = z.enum(VALID_PRIORITIES);
@@ -75,6 +84,7 @@ export const bulkUpdateBody = z.object({
 });
 
 export const createTaskBody = z.object({
+  requirementData: requirementDataSchema.optional(),
   title: z.string(),
   description: z.string(),
   startDate: z.string().optional(),
@@ -152,7 +162,8 @@ export const updateTrackingBody = z.object({
     description: "ISO timestamp of when work actually started; null clears it.",
   }),
   actualEndAt: z.string().nullable().optional().openapi({
-    description: "ISO timestamp of when work actually finished; null clears it.",
+    description:
+      "ISO timestamp of when work actually finished; null clears it.",
   }),
 });
 export const updateRecurrenceBody = z.object({

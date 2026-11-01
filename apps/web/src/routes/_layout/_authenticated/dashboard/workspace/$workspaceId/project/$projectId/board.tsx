@@ -8,7 +8,6 @@ import PageTitle from "@/components/page-title";
 import { DisplaySection } from "@/components/project/display/display-section";
 import { TaskDisplayOptions } from "@/components/project/display/task-display-options";
 import { ActiveFiltersBar } from "@/components/project/task-filters/active-filters-bar";
-import { ProjectInsightsBar } from "@/components/project/insights";
 import { ProjectToolbar } from "@/components/project/toolbar/project-toolbar";
 import { TaskCount } from "@/components/project/toolbar/task-count";
 import { useProjectTaskView } from "@/components/project/toolbar/use-project-task-view";
@@ -144,9 +143,6 @@ function RouteComponent() {
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="board"
-      insights={
-        sortedProject ? <ProjectInsightsBar project={sortedProject} /> : null
-      }
       toolbar={
         <ProjectToolbar
           view={view}

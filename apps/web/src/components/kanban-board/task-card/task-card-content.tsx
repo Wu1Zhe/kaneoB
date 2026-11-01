@@ -1,3 +1,4 @@
+import { RequirementNodeTimes } from "@/components/requirement/requirement-node-times";
 import { Trash2Icon } from "lucide-react";
 import { memo, type TouchEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -195,6 +196,9 @@ function TaskCardContent({
               <div className="mt-2.5 flex flex-wrap items-center gap-1 empty:hidden">
                 {showPriority && hasPriority && <PriorityChip task={task} />}
                 {showDueDates && <DueDateChip task={task} />}
+                {task.projectKind === "requirement" && (
+                  <RequirementNodeTimes task={task} />
+                )}
                 <TaskRecurrenceBadge task={task} />
                 <SubtasksChip task={task} workspaceId={workspaceId} />
                 {showTaskItemCounts && <ChecklistChip task={task} />}

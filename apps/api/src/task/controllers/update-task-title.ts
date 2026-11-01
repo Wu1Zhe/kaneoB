@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable } from "../../database/schema";
+import { taskTable, projectTable } from "../../database/schema";
 import {
   publishTaskMutation,
   recordTaskMutation,
@@ -26,6 +26,11 @@ async function updateTaskTitle({
     });
   }
 
+  const container = await db.query.projectTable.findFirst({
+    where: eq(projectTable.id, existingTask.projectId),
+  });
+  if (container?.kind === "requirement" && !title.trim())
+    throw new HTTPException(400, { message: "Requirement name is required" });
   if (existingTask.title === title) return existingTask;
 
   // Audit history is not best-effort. Commit the title and its immutable

@@ -1,3 +1,4 @@
+import { RequirementList } from "@/components/requirement/requirement-list";
 import {
   closestCorners,
   DndContext,
@@ -16,6 +17,7 @@ import { produce } from "immer";
 import { Flag, ArchiveIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { priorityColorsTaskCard } from "@/constants/priority-colors";
@@ -50,6 +52,7 @@ function ListView({
   disableCollectionActions = false,
 }: ListViewProps) {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
   const reduceMotion = useReducedMotion();
   const { setProject } = useProjectStore();
   const setAvailableTasks = useBulkSelectionStore(
@@ -78,11 +81,11 @@ function ListView({
     isLoading: relationsLoading,
     isError: relationsFailed,
     refetch: refetchRelations,
-  } = useGetProjectTaskRelations(project?.id ?? "");
+  } = useGetProjectTaskRelations(isRequirement ? "" : (project?.id ?? ""));
 
   const subtaskChildren = useMemo(
-    () => buildSubtaskChildren(relations ?? []),
-    [relations],
+    () => buildSubtaskChildren(isRequirement ? [] : (relations ?? [])),
+    [relations, isRequirement],
   );
 
   const tasksById = useMemo(() => {
@@ -383,6 +386,8 @@ function ListView({
         .find((task) => task.id === activeId)
     : null;
 
+  if (isRequirement) return <RequirementList project={project} />;
+
   return (
     <DndContext
       sensors={disableDragDrop ? [] : sensors}
@@ -399,7 +404,7 @@ function ListView({
       modifiers={[snapCenterToCursor]}
     >
       <div className="w-full h-full overflow-auto bg-muted/20">
-        {relationsFailed && (
+        {!isRequirement && relationsFailed && (
           // Without relations every task renders as a top-level row, which
           // reads exactly like a project with no subtasks; this says it isn't.
           <div

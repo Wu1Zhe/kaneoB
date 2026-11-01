@@ -951,12 +951,13 @@ export default function CommentEditor({
   }, [editor, updateSlashMenu]);
 
   useEffect(() => {
-    if (!editor) return;
-    editor.setEditable(!readOnly && !disabled);
+    if (!editor || editor.isDestroyed) return;
+    editor.setEditable(!readOnly && !disabled, false);
   }, [disabled, editor, readOnly]);
 
   useEffect(() => {
-    if (!editor) return;
+    // A dependency change can replace the instance earlier in this commit.
+    if (!editor || editor.isDestroyed) return;
     if (lastEditorRef.current !== editor) {
       hasHydratedRef.current = false;
       lastEditorRef.current = editor;

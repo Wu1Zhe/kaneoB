@@ -33,12 +33,18 @@ import generateProjectSlug from "@/lib/generate-project-id";
 import { toast } from "@/lib/toast";
 
 type CreateProjectModalProps = {
+  kind?: "project" | "requirement";
   open: boolean;
   onClose: () => void;
 };
 
-function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
+function CreateProjectModal({
+  open,
+  onClose,
+  kind = "project",
+}: CreateProjectModalProps) {
   const { t } = useTranslation();
+  const isRequirement = kind === "requirement";
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Layout");
@@ -52,6 +58,7 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
     slug,
     workspaceId: workspace?.id ?? "",
     icon: selectedIcon,
+    kind,
   });
   const SelectedIcon =
     icons[selectedIcon as keyof typeof icons] || icons.Layout;
@@ -75,7 +82,14 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
 
     try {
       const { id } = await mutateAsync();
-      toast.success("Project created successfully", { icon: SquarePlusIcon });
+      toast.success(
+        t(
+          isRequirement
+            ? "requirements:created"
+            : "requirements:projectCreated",
+        ),
+        { icon: SquarePlusIcon },
+      );
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
 
       navigate({
@@ -107,7 +121,11 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
       <DialogContent className="max-w-md" showCloseButton={false}>
         <DialogHeader className="px-3 pt-4 pb-1 gap-1.5">
           <DialogTitle className="sr-only">
-            {t("common:modals.createProject.title")}
+            {t(
+              isRequirement
+                ? "requirements:createTitle"
+                : "common:modals.createProject.title",
+            )}
           </DialogTitle>
           <Breadcrumb>
             <BreadcrumbList className="gap-1 text-xs">
@@ -117,12 +135,20 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
               </BreadcrumbItem>
               <BreadcrumbSeparator className="[&>svg]:size-3.5" />
               <BreadcrumbItem className="text-foreground font-medium">
-                {t("common:modals.createProject.breadcrumbNew")}
+                {t(
+                  isRequirement
+                    ? "requirements:createTitle"
+                    : "common:modals.createProject.breadcrumbNew",
+                )}
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
           <DialogDescription className="sr-only">
-            {t("common:modals.createProject.description")}
+            {t(
+              isRequirement
+                ? "requirements:createDescription"
+                : "common:modals.createProject.description",
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -192,7 +218,11 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
               value={name}
               onChange={handleNameChange}
               autoFocus
-              placeholder={t("common:modals.createProject.projectName")}
+              placeholder={t(
+                isRequirement
+                  ? "requirements:name"
+                  : "common:modals.createProject.projectName",
+              )}
               className="w-full [&_[data-slot=input]]:h-auto [&_[data-slot=input]]:px-0 [&_[data-slot=input]]:py-2 [&_[data-slot=input]]:text-2xl [&_[data-slot=input]]:leading-tight [&_[data-slot=input]]:font-semibold [&_[data-slot=input]]:tracking-tight [&_[data-slot=input]]:text-foreground [&_[data-slot=input]]:placeholder:text-muted-foreground [&_[data-slot=input]]:outline-none"
               required
             />
@@ -250,7 +280,11 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
               size="sm"
               className="bg-primary hover:bg-primary/90  disabled:opacity-50"
             >
-              {t("common:modals.createProject.createButton")}
+              {t(
+                isRequirement
+                  ? "requirements:create"
+                  : "common:modals.createProject.createButton",
+              )}
             </Button>
           </DialogFooter>
         </form>

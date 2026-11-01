@@ -28,7 +28,13 @@ export default function MobileProjectNav({
 }: MobileProjectNavProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const { data: projects = [] } = useGetProjects({ workspaceId });
+  const { data: allProjects = [] } = useGetProjects({ workspaceId });
+  const kind =
+    allProjects.find((project) => project.id === projectId)?.kind ?? "project";
+  const projects = allProjects.filter(
+    (project) => (project.kind ?? "project") === kind,
+  );
+  const isRequirement = kind === "requirement";
   const currentProject = projects?.find((project) => project.id === projectId);
   const CurrentIcon =
     icons[currentProject?.icon as keyof typeof icons] || icons.Layout;
@@ -60,7 +66,11 @@ export default function MobileProjectNav({
         <div className="space-y-3">
           <div className="space-y-1">
             <p className="px-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-              {t("navigation:sidebar.projects")}
+              {t(
+                isRequirement
+                  ? "requirements:title"
+                  : "navigation:sidebar.projects",
+              )}
             </p>
             <div className="max-h-56 space-y-0.5 overflow-y-auto">
               {(projects ?? []).map((project) => {
@@ -95,7 +105,11 @@ export default function MobileProjectNav({
             className="flex h-10 w-full items-center gap-2 rounded-md border border-border px-2.5 text-left text-sm text-foreground transition-colors hover:bg-accent"
           >
             <Plus className="size-4" />
-            {t("navigation:projectList.addProject")}
+            {t(
+              isRequirement
+                ? "requirements:add"
+                : "navigation:projectList.addProject",
+            )}
           </button>
         </div>
       </PopoverContent>

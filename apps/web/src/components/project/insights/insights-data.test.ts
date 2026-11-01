@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vite-plus/test";
 import type Task from "@/types/task";
+import type { ProjectWithTasks } from "@/types/project";
 import {
   buildPeopleTable,
   buildStatusCounts,
   buildTrend,
+  collectInsightTasks,
+  getInsightColumns,
   getOverdueEntries,
   summarizeTasks,
   UNASSIGNED_KEY,
@@ -37,6 +40,66 @@ function task(overrides: Partial<Task>): Task {
     ...overrides,
   };
 }
+
+describe("whole-project insights", () => {
+  it("includes board and backlog tasks once, with archived tasks counted as final", () => {
+    const active = task({
+      id: "active",
+      dueDate: new Date(2026, 9, 13).toISOString(),
+    });
+    const planned = task({
+      id: "planned",
+      status: "planned",
+      dueDate: new Date(2026, 9, 13).toISOString(),
+    });
+    const archived = task({
+      id: "archived",
+      status: "archived",
+      dueDate: new Date(2026, 9, 13).toISOString(),
+    });
+    const project = {
+      columns: columns.map((column, index) => ({
+        ...column,
+        tasks: index === 0 ? [active] : [],
+      })),
+      plannedTasks: [planned, active],
+      archivedTasks: [archived],
+    } as ProjectWithTasks;
+    const tasks = collectInsightTasks(project);
+    const statuses = getInsightColumns(project);
+    expect(tasks.map((entry) => entry.id)).toEqual([
+      "active",
+      "planned",
+      "archived",
+    ]);
+    expect(
+      buildStatusCounts(tasks, statuses).map((status) => [
+        status.slug,
+        status.count,
+      ]),
+    ).toEqual([
+      ["to-do", 1],
+      ["in-progress", 0],
+      ["done", 0],
+      ["planned", 1],
+      ["archived", 1],
+    ]);
+    expect(summarizeTasks(tasks, statuses, now)).toMatchObject({
+      total: 3,
+      completed: 1,
+      overdue: 2,
+    });
+    expect(
+      getOverdueEntries(tasks, statuses, "overdue", now).map(
+        (entry) => entry.task.id,
+      ),
+    ).toEqual(["active", "planned"]);
+    expect(buildPeopleTable(tasks, statuses)[0]).toMatchObject({
+      total: 3,
+      counts: { "to-do": 1, planned: 1, archived: 1 },
+    });
+  });
+});
 
 describe("getOverdueEntries", () => {
   it("keeps open overdue tasks and sorts by priority, then lateness", () => {

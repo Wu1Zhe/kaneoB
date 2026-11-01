@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import type { ProjectWithTasks } from "@/types/project";
+import type { InsightProject } from "./insights-data";
 import { buildStatusColorMap } from "./insight-colors";
 import {
   buildPeopleTable,
@@ -14,8 +14,10 @@ import { PeopleStatusTable } from "./people-status-table";
 
 export function PeopleInsightsPanel({
   project,
+  workspaceId,
 }: {
-  project: ProjectWithTasks;
+  project: InsightProject;
+  workspaceId?: string;
 }) {
   const { t } = useTranslation();
   const columns = useMemo(() => getInsightColumns(project), [project]);
@@ -36,7 +38,12 @@ export function PeopleInsightsPanel({
         </Badge>
       </div>
       <div className="px-3 pt-2 pb-3">
-        <PeopleStatusTable rows={rows} columns={columns} colors={colors} />
+        <PeopleStatusTable
+          rows={rows}
+          columns={columns}
+          colors={colors}
+          workspaceId={workspaceId}
+        />
       </div>
     </Card>
   );

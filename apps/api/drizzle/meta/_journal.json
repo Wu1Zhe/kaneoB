@@ -519,6 +519,34 @@
       "when": 1793347744345,
       "tag": "0073_windy_ultron",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1793500857320,
+      "tag": "0074_slim_ghost_rider",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1793514601677,
+      "tag": "0075_numerous_groot",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1793518773081,
+      "tag": "0076_clean_richard_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1793524324522,
+      "tag": "0077_legal_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

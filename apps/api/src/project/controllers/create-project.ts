@@ -7,9 +7,10 @@ async function createProject(
   icon: string,
   slug: string,
   userId: string,
+  kind: "project" | "requirement" = "project",
 ) {
   return db.transaction((tx) =>
-    insertProject(tx, { workspaceId, name, icon, slug, userId }),
+    insertProject(tx, { workspaceId, name, icon, slug, userId, kind }),
   );
 }
 

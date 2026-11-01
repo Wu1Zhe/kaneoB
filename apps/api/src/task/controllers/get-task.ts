@@ -30,6 +30,10 @@ async function getTask(taskId: string, board = false, userId?: string) {
       priority: taskTable.priority,
       progress: taskTable.progress,
       weight: taskTable.weight,
+      requirementData: taskTable.requirementData,
+      projectKind: sql<
+        "project" | "requirement"
+      >`(select ${projectTable.kind} from ${projectTable} where ${projectTable.id} = ${taskTable.projectId})`,
       startDate: taskTable.startDate,
       dueDate: taskTable.dueDate,
       actualStartAt: taskTable.actualStartAt,
@@ -37,8 +41,13 @@ async function getTask(taskId: string, board = false, userId?: string) {
       recurrence: taskTable.recurrence,
       position: taskTable.position,
       createdAt: taskTable.createdAt,
+      updatedAt: taskTable.updatedAt,
       userId: taskTable.userId,
       createdBy: taskTable.createdBy,
+      updatedBy: taskTable.updatedBy,
+      updaterName: sql<
+        string | null
+      >`(select name from "user" where id = ${taskTable.updatedBy})`,
       assigneeName: userTable.name,
       assigneeId: userTable.id,
       creatorName: creator.name,

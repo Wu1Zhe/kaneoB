@@ -195,6 +195,12 @@ async function getTasksPage(
     priority: taskTable.priority,
     progress: taskTable.progress,
     weight: taskTable.weight,
+    requirementData: options.publicOnly
+      ? sql<Record<string, string | null> | null>`null`
+      : taskTable.requirementData,
+    projectKind: sql<
+      "project" | "requirement"
+    >`coalesce(${projectTable.kind}, 'project')`,
     startDate: taskTable.startDate,
     dueDate: taskTable.dueDate,
     actualStartAt: taskTable.actualStartAt,
@@ -205,6 +211,12 @@ async function getTasksPage(
     updatedAt: taskTable.updatedAt,
     userId: taskTable.userId,
     createdBy: taskTable.createdBy,
+    updatedBy: options.publicOnly ? sql<null>`null` : taskTable.updatedBy,
+    updaterName: options.publicOnly
+      ? sql<null>`null`
+      : sql<
+          string | null
+        >`(select name from "user" where id = ${taskTable.updatedBy})`,
     assigneeName: userTable.name,
     assigneeId: userTable.id,
     assigneeImage: userTable.image,

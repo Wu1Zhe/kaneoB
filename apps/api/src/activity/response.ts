@@ -1,7 +1,7 @@
 import { responseTimestamp, z } from "../openapi";
 
 const activityTypeDescription =
-  "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed.";
+  "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed, requirement_plan_changed, requirement_actual_changed, requirement_details_changed.";
 
 export const activitySchema = z
   .object({
@@ -57,3 +57,12 @@ export const workspaceActivityListSchema = z.array(
     })
     .openapi("WorkspaceActivity"),
 );
+
+export const projectChangesSchema = z
+  .object({
+    data: workspaceActivityListSchema,
+    nextCursor: z
+      .object({ createdAt: responseTimestamp, id: z.string() })
+      .nullable(),
+  })
+  .openapi("ProjectChanges");

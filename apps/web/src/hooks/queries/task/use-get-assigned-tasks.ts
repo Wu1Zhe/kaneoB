@@ -4,10 +4,11 @@ import getAssignedTasks from "@/fetchers/task/get-assigned-tasks";
 function useGetAssignedTasks(
   workspaceId: string | undefined,
   countOnly = false,
+  kind?: "project" | "requirement",
 ) {
   return useQuery({
-    queryKey: ["assigned-tasks", workspaceId, { countOnly }],
-    queryFn: () => getAssignedTasks(workspaceId ?? "", countOnly),
+    queryKey: ["assigned-tasks", workspaceId, { countOnly, kind }],
+    queryFn: () => getAssignedTasks(workspaceId ?? "", countOnly, kind),
     enabled: Boolean(workspaceId),
     // The app default skips refetching on mount; these lists go stale while
     // the user works elsewhere.

@@ -1126,6 +1126,17 @@ subscribeToEvent<{
   );
 });
 
+subscribeToEvent<{ projectId: string; taskId: string }>(
+  "activity.created",
+  async (data) => {
+    broadcastToProject(data.projectId, {
+      type: "ACTIVITY_CREATED",
+      projectId: data.projectId,
+      taskId: data.taskId,
+    });
+  },
+);
+
 for (const eventName of taskUpdateEvents) {
   subscribeToEvent<TaskEvent>(eventName, async (data) => {
     const { projectId, initiatorId } = data;
@@ -1207,3 +1218,14 @@ subscribeToEvent<{
     tasks: data.tasks,
   });
 });
+
+subscribeToEvent<{ projectId: string; initiatorId?: string }>(
+  "idea.changed",
+  async ({ projectId, initiatorId }) => {
+    broadcastToProject(
+      projectId,
+      { type: "IDEAS_UPDATED", projectId },
+      initiatorId,
+    );
+  },
+);

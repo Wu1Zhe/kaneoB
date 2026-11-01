@@ -15,22 +15,27 @@ export type ProjectView =
   | "backlog"
   | "calendar"
   | "gantt"
-  | "hierarchy";
+  | "hierarchy"
+  | "insights"
+  | "ideas";
 
 export type ProjectRoute =
   | "board"
   | "backlog"
   | "calendar"
   | "gantt"
-  | "hierarchy";
+  | "hierarchy"
+  | "insights"
+  | "ideas";
 
 export const PROJECT_ROUTE_PATHS = {
+  ideas: "/dashboard/workspace/$workspaceId/project/$projectId/ideas",
+  insights: "/dashboard/workspace/$workspaceId/project/$projectId/insights",
   board: "/dashboard/workspace/$workspaceId/project/$projectId/board",
   backlog: "/dashboard/workspace/$workspaceId/project/$projectId/backlog",
   calendar: "/dashboard/workspace/$workspaceId/project/$projectId/calendar",
   gantt: "/dashboard/workspace/$workspaceId/project/$projectId/gantt",
-  hierarchy:
-    "/dashboard/workspace/$workspaceId/project/$projectId/hierarchy",
+  hierarchy: "/dashboard/workspace/$workspaceId/project/$projectId/hierarchy",
 } as const;
 
 export const PROJECT_VIEWS: ReadonlyArray<{
@@ -82,7 +87,8 @@ export function resolveProjectView(
 }
 
 export const TASK_LAYOUTS = PROJECT_VIEWS.filter(
-  (view) => view.id !== "backlog",
+  (view) =>
+    view.id !== "backlog" && view.id !== "insights" && view.id !== "ideas",
 );
 
 export function tasksViewFor(

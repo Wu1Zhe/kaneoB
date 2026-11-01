@@ -18,7 +18,9 @@ let shuttingDown = false;
 
 function killTree(pid) {
   if (process.platform === "win32") {
-    spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], { stdio: "ignore" });
+    spawnSync("taskkill", ["/PID", String(pid), "/T", "/F"], {
+      stdio: "ignore",
+    });
   } else {
     try {
       process.kill(pid, "SIGTERM");
@@ -37,7 +39,10 @@ function shutdown(code) {
 }
 
 function run(name, cwd, entry, args) {
-  const child = spawn(process.execPath, [entry, ...args], { cwd, stdio: "inherit" });
+  const child = spawn(process.execPath, [entry, ...args], {
+    cwd,
+    stdio: "inherit",
+  });
   children.push(child);
   child.on("error", (error) => {
     console.error(`[${name}] failed to start:`, error);
@@ -45,7 +50,9 @@ function run(name, cwd, entry, args) {
   });
   child.on("exit", (code, signal) => {
     if (shuttingDown) return;
-    console.error(`[${name}] exited (code=${code}, signal=${signal}); stopping the other process.`);
+    console.error(
+      `[${name}] exited (code=${code}, signal=${signal}); stopping the other process.`,
+    );
     shutdown(code ?? 1);
   });
 }

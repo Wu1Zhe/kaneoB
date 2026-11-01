@@ -1,7 +1,10 @@
+import { requestActor } from "../utils/request-actor";
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
+  bigserial,
   boolean,
+  check,
   customType,
   foreignKey,
   index,
@@ -512,7 +515,13 @@ export const projectTable = pgTable(
       }),
     slug: text("slug").notNull(),
     icon: text("icon").default("Layout"),
+    reportingStartedAt: timestamp("reporting_started_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
     name: text("name").notNull(),
+    kind: text("kind", { enum: ["project", "requirement"] })
+      .default("project")
+      .notNull(),
     description: text("description"),
     createdAt: timestamp("created_at", { mode: "date" })
       .default(utcNow)
@@ -530,6 +539,10 @@ export const projectTable = pgTable(
       .on(table.backgroundObjectKey)
       .where(sql`${table.backgroundObjectKey} is not null`),
     unique("project_workspace_id_id_unique").on(table.workspaceId, table.id),
+    check(
+      "project_kind_check",
+      sql`${table.kind} in ('project', 'requirement')`,
+    ),
     index("project_workspaceId_position_idx").on(
       table.workspaceId,
       table.position,
@@ -715,6 +728,11 @@ export const taskTable = pgTable(
     priority: text("priority").default("low").notNull(),
     progress: integer("progress").default(0).notNull(),
     weight: real("weight").default(1).notNull(),
+    updatedBy: text("updated_by")
+      .$defaultFn(() => requestActor.getStore() ?? sql`null`)
+      .$onUpdate(() => requestActor.getStore() ?? sql`null`),
+    requirementData:
+      jsonb("requirement_data").$type<Record<string, string | null>>(),
     startDate: timestamp("start_date", { mode: "date" }),
     dueDate: timestamp("due_date", { mode: "date" }),
     actualStartAt: timestamp("actual_start_at", { mode: "date" }),
@@ -1668,3 +1686,85 @@ export const dataMigrationTable = pgTable("data_migration", {
     .default(utcNow)
     .notNull(),
 });
+
+export const taskRevisionTable = pgTable(
+  "task_revision",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    projectId: text("project_id").notNull(),
+    taskId: text("task_id").notNull(),
+    operation: text("operation").notNull(),
+    recordedAt: timestamp("recorded_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    data: jsonb("data").$type<Record<string, unknown>>().notNull(),
+  },
+  (table) => [
+    index("task_revision_project_time_idx").on(
+      table.projectId,
+      table.recordedAt,
+    ),
+    index("task_revision_task_time_idx").on(table.taskId, table.recordedAt),
+  ],
+);
+export const dashboardSnapshotTable = pgTable(
+  "dashboard_snapshot",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, { onDelete: "cascade" }),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    data: jsonb("data").$type<Record<string, unknown>>().notNull(),
+  },
+  (table) => [index("dashboard_snapshot_project_idx").on(table.projectId)],
+);
+
+export const ideaTable = pgTable(
+  "idea",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description").default("").notNull(),
+    status: text("status")
+      .$type<"inbox" | "evaluating" | "adopted" | "parked">()
+      .default("inbox")
+      .notNull(),
+    tags: jsonb("tags").$type<string[]>().default([]).notNull(),
+    pinned: boolean("pinned").default(false).notNull(),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    updatedBy: text("updated_by").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .default(utcNow)
+      .notNull()
+      .$onUpdate(() => new Date()),
+    version: integer("version").default(1).notNull(),
+    convertedTaskId: text("converted_task_id").references(() => taskTable.id, {
+      onDelete: "set null",
+    }),
+    convertedAt: timestamp("converted_at", { mode: "date" }),
+  },
+  (table) => [
+    index("idea_project_updated_idx").on(table.projectId, table.updatedAt),
+  ],
+);

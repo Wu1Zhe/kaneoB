@@ -5,6 +5,114 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"requirements": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"add": {
+					"type": "string"
+				},
+				"view": {
+					"type": "string"
+				},
+				"share": {
+					"type": "string"
+				},
+				"settings": {
+					"type": "string"
+				},
+				"delete": {
+					"type": "string"
+				},
+				"deleteConfirmTitle": {
+					"type": "string"
+				},
+				"deleteConfirmDescription": {
+					"type": "string"
+				},
+				"deleted": {
+					"type": "string"
+				},
+				"created": {
+					"type": "string"
+				},
+				"projectCreated": {
+					"type": "string"
+				},
+				"createTitle": {
+					"type": "string"
+				},
+				"createDescription": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"create": {
+					"type": "string"
+				},
+				"empty": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"title",
+				"add",
+				"view",
+				"share",
+				"settings",
+				"delete",
+				"deleteConfirmTitle",
+				"deleteConfirmDescription",
+				"deleted",
+				"created",
+				"projectCreated",
+				"createTitle",
+				"createDescription",
+				"name",
+				"create",
+				"empty"
+			]
+		},
+		"todayChanges": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"loading": {
+					"type": "string"
+				},
+				"error": {
+					"type": "string"
+				},
+				"retry": {
+					"type": "string"
+				},
+				"empty": {
+					"type": "string"
+				},
+				"emptyDescription": {
+					"type": "string"
+				},
+				"more": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"title",
+				"loading",
+				"error",
+				"retry",
+				"empty",
+				"emptyDescription",
+				"more"
+			]
+		},
 		"common": {
 			"type": "object",
 			"additionalProperties": false,
@@ -12703,6 +12811,19 @@
 								}
 							},
 							"required": ["title", "contentWithTask", "contentWithoutTask"]
+						},
+						"task_nudge": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"title": {
+									"type": "string"
+								},
+								"content": {
+									"type": "string"
+								}
+							},
+							"required": ["title", "content"]
 						}
 					},
 					"required": [
@@ -12714,7 +12835,8 @@
 						"task_comment",
 						"due_date_reminder",
 						"task_overdue",
-						"time_entry_created"
+						"time_entry_created",
+						"task_nudge"
 					]
 				},
 				"inbox": {
@@ -12842,6 +12964,9 @@
 					"type": "string"
 				},
 				"changedTitle": {
+					"type": "string"
+				},
+				"changedProgress": {
 					"type": "string"
 				},
 				"moved": {
@@ -13265,6 +13390,7 @@
 				"setDueDate",
 				"changedDueDate",
 				"changedTitle",
+				"changedProgress",
 				"moved",
 				"movedFromOtherProject",
 				"created",
@@ -16045,6 +16171,12 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
+						"time": {
+							"type": "string"
+						},
+						"apply": {
+							"type": "string"
+						},
 						"dueDatePlaceholder": {
 							"type": "string"
 						},
@@ -16074,6 +16206,8 @@
 						}
 					},
 					"required": [
+						"time",
+						"apply",
 						"dueDatePlaceholder",
 						"startDatePlaceholder",
 						"datePlaceholder",
@@ -16083,6 +16217,449 @@
 						"startsOn",
 						"beforeStart",
 						"afterDue"
+					]
+				},
+				"insights": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"overdueTitle": {
+							"type": "string"
+						},
+						"tabOverdue": {
+							"type": "string"
+						},
+						"tabDueSoon": {
+							"type": "string"
+						},
+						"overdueFor": {
+							"type": "string"
+						},
+						"dueIn": {
+							"type": "string"
+						},
+						"nudge": {
+							"type": "string"
+						},
+						"nudgeSent": {
+							"type": "string"
+						},
+						"nudgeNoAssignee": {
+							"type": "string"
+						},
+						"nudgeFailed": {
+							"type": "string"
+						},
+						"changeDueDate": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						},
+						"emptyOverdueTitle": {
+							"type": "string"
+						},
+						"emptyOverdueDescription": {
+							"type": "string"
+						},
+						"emptyDueSoonTitle": {
+							"type": "string"
+						},
+						"emptyDueSoonDescription": {
+							"type": "string"
+						},
+						"moreCount": {
+							"type": "string"
+						},
+						"moreCount_zero": {
+							"type": "string"
+						},
+						"moreCount_one": {
+							"type": "string"
+						},
+						"moreCount_two": {
+							"type": "string"
+						},
+						"moreCount_few": {
+							"type": "string"
+						},
+						"moreCount_many": {
+							"type": "string"
+						},
+						"moreCount_other": {
+							"type": "string"
+						},
+						"durationMinutes_one": {
+							"type": "string"
+						},
+						"durationMinutes_zero": {
+							"type": "string"
+						},
+						"durationMinutes_two": {
+							"type": "string"
+						},
+						"durationMinutes_few": {
+							"type": "string"
+						},
+						"durationMinutes_many": {
+							"type": "string"
+						},
+						"durationMinutes_other": {
+							"type": "string"
+						},
+						"durationHours_one": {
+							"type": "string"
+						},
+						"durationHours_zero": {
+							"type": "string"
+						},
+						"durationHours_two": {
+							"type": "string"
+						},
+						"durationHours_few": {
+							"type": "string"
+						},
+						"durationHours_many": {
+							"type": "string"
+						},
+						"durationHours_other": {
+							"type": "string"
+						},
+						"durationDays_one": {
+							"type": "string"
+						},
+						"durationDays_zero": {
+							"type": "string"
+						},
+						"durationDays_two": {
+							"type": "string"
+						},
+						"durationDays_few": {
+							"type": "string"
+						},
+						"durationDays_many": {
+							"type": "string"
+						},
+						"durationDays_other": {
+							"type": "string"
+						},
+						"durationDaysHours": {
+							"type": "string"
+						},
+						"durationWeeks_one": {
+							"type": "string"
+						},
+						"durationWeeks_zero": {
+							"type": "string"
+						},
+						"durationWeeks_two": {
+							"type": "string"
+						},
+						"durationWeeks_few": {
+							"type": "string"
+						},
+						"durationWeeks_many": {
+							"type": "string"
+						},
+						"durationWeeks_other": {
+							"type": "string"
+						},
+						"statsTitle": {
+							"type": "string"
+						},
+						"tabPeople": {
+							"type": "string"
+						},
+						"tabTasks": {
+							"type": "string"
+						},
+						"person": {
+							"type": "string"
+						},
+						"total": {
+							"type": "string"
+						},
+						"taskColumn": {
+							"type": "string"
+						},
+						"emptyStats": {
+							"type": "string"
+						},
+						"statusDistribution": {
+							"type": "string"
+						},
+						"trendTitle": {
+							"type": "string"
+						},
+						"range7": {
+							"type": "string"
+						},
+						"range30": {
+							"type": "string"
+						},
+						"created": {
+							"type": "string"
+						},
+						"completed": {
+							"type": "string"
+						},
+						"date": {
+							"type": "string"
+						},
+						"kpiTotal": {
+							"type": "string"
+						},
+						"kpiCompletion": {
+							"type": "string"
+						},
+						"kpiOverdue": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"overdueTitle",
+						"tabOverdue",
+						"tabDueSoon",
+						"overdueFor",
+						"dueIn",
+						"nudge",
+						"nudgeSent",
+						"nudgeNoAssignee",
+						"nudgeFailed",
+						"changeDueDate",
+						"unassigned",
+						"emptyOverdueTitle",
+						"emptyOverdueDescription",
+						"emptyDueSoonTitle",
+						"emptyDueSoonDescription",
+						"durationDaysHours",
+						"statsTitle",
+						"tabPeople",
+						"tabTasks",
+						"person",
+						"total",
+						"taskColumn",
+						"emptyStats",
+						"statusDistribution",
+						"trendTitle",
+						"range7",
+						"range30",
+						"created",
+						"completed",
+						"date",
+						"kpiTotal",
+						"kpiCompletion",
+						"kpiOverdue"
+					]
+				},
+				"requirement": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"fields": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"reference": {
+									"type": "string"
+								},
+								"type": {
+									"type": "string"
+								},
+								"category": {
+									"type": "string"
+								},
+								"department": {
+									"type": "string"
+								},
+								"contact": {
+									"type": "string"
+								},
+								"benefit": {
+									"type": "string"
+								},
+								"notes": {
+									"type": "string"
+								},
+								"planProvidedAt": {
+									"type": "string"
+								},
+								"designStartPlannedAt": {
+									"type": "string"
+								},
+								"designStartActualAt": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"reference",
+								"type",
+								"category",
+								"department",
+								"contact",
+								"benefit",
+								"notes",
+								"planProvidedAt",
+								"designStartPlannedAt",
+								"designStartActualAt"
+							]
+						},
+						"nodeTimes": {
+							"type": "string"
+						},
+						"stage": {
+							"type": "string"
+						},
+						"planned": {
+							"type": "string"
+						},
+						"actual": {
+							"type": "string"
+						},
+						"date": {
+							"type": "string"
+						},
+						"time": {
+							"type": "string"
+						},
+						"clear": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"workflow": {
+							"type": "string"
+						},
+						"saveError": {
+							"type": "string"
+						},
+						"notScheduled": {
+							"type": "string"
+						},
+						"manualHint": {
+							"type": "string"
+						},
+						"editHint": {
+							"type": "string"
+						},
+						"stageAlert": {
+							"type": "string"
+						},
+						"emptyHierarchy": {
+							"type": "string"
+						},
+						"changesHint": {
+							"type": "string"
+						},
+						"fieldChanged": {
+							"type": "string"
+						},
+						"unset": {
+							"type": "string"
+						},
+						"timing": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"unplanned": {
+									"type": "string"
+								},
+								"pending": {
+									"type": "string"
+								},
+								"overdue": {
+									"type": "string"
+								},
+								"onTime": {
+									"type": "string"
+								},
+								"late": {
+									"type": "string"
+								},
+								"completed": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"unplanned",
+								"pending",
+								"overdue",
+								"onTime",
+								"late",
+								"completed"
+							]
+						},
+						"required": {
+							"type": "string"
+						},
+						"requiredCreate": {
+							"type": "string"
+						},
+						"autoReference": {
+							"type": "string"
+						},
+						"nameRequired": {
+							"type": "string"
+						},
+						"descriptionRequired": {
+							"type": "string"
+						},
+						"mappingHint": {
+							"type": "string"
+						},
+						"emptyValue": {
+							"type": "string"
+						},
+						"planColumn": {
+							"type": "string"
+						},
+						"actualColumn": {
+							"type": "string"
+						},
+						"start": {
+							"type": "string"
+						},
+						"finish": {
+							"type": "string"
+						},
+						"legacyMissing": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"fields",
+						"nodeTimes",
+						"stage",
+						"planned",
+						"actual",
+						"date",
+						"time",
+						"clear",
+						"save",
+						"workflow",
+						"saveError",
+						"notScheduled",
+						"manualHint",
+						"editHint",
+						"stageAlert",
+						"emptyHierarchy",
+						"changesHint",
+						"fieldChanged",
+						"unset",
+						"timing",
+						"required",
+						"requiredCreate",
+						"autoReference",
+						"nameRequired",
+						"descriptionRequired",
+						"mappingHint",
+						"emptyValue",
+						"planColumn",
+						"actualColumn",
+						"start",
+						"finish",
+						"legacyMissing"
 					]
 				}
 			},
@@ -16134,7 +16711,9 @@
 				"filterMenu",
 				"shortcuts",
 				"due",
-				"datePicker"
+				"datePicker",
+				"insights",
+				"requirement"
 			]
 		},
 		"invitations": {
@@ -16738,6 +17317,16 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
+						"insights": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"overdueTitle": {
+									"type": "string"
+								}
+							},
+							"required": ["overdueTitle"]
+						},
 						"pageTitle": {
 							"type": "string"
 						},
@@ -16764,7 +17353,13 @@
 							"type": "string"
 						}
 					},
-					"required": ["pageTitle", "emptyDescription", "groupBy", "truncated"]
+					"required": [
+						"insights",
+						"pageTitle",
+						"emptyDescription",
+						"groupBy",
+						"truncated"
+					]
 				},
 				"archived": {
 					"type": "object",
@@ -19957,6 +20552,16 @@
 					"type": "object",
 					"additionalProperties": false,
 					"properties": {
+						"insights": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"overdueTitle": {
+									"type": "string"
+								}
+							},
+							"required": ["overdueTitle"]
+						},
 						"title": {
 							"type": "string"
 						},
@@ -20033,7 +20638,7 @@
 							"type": "string"
 						}
 					},
-					"required": ["title", "by", "due", "empty", "showing"]
+					"required": ["insights", "title", "by", "due", "empty", "showing"]
 				},
 				"nav": {
 					"type": "object",
@@ -21549,9 +22154,884 @@
 				"labels",
 				"permissions"
 			]
+		},
+		"reporting": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"projectBoard": {
+					"type": "string"
+				},
+				"requirementBoard": {
+					"type": "string"
+				},
+				"sourceFilter": {
+					"type": "string"
+				},
+				"sourceAll": {
+					"type": "string"
+				},
+				"sourceProject": {
+					"type": "string"
+				},
+				"sourceRequirement": {
+					"type": "string"
+				},
+				"overview": {
+					"type": "string"
+				},
+				"total": {
+					"type": "string"
+				},
+				"taskTotal": {
+					"type": "string"
+				},
+				"launched": {
+					"type": "string"
+				},
+				"overdue": {
+					"type": "string"
+				},
+				"active": {
+					"type": "string"
+				},
+				"acceptance": {
+					"type": "string"
+				},
+				"loading": {
+					"type": "string"
+				},
+				"loadError": {
+					"type": "string"
+				},
+				"retry": {
+					"type": "string"
+				},
+				"empty": {
+					"type": "string"
+				},
+				"unassigned": {
+					"type": "string"
+				},
+				"delivery": {
+					"type": "string"
+				},
+				"overdueDays": {
+					"type": "string"
+				},
+				"historicalRow": {
+					"type": "string"
+				},
+				"noBaseline": {
+					"type": "string"
+				},
+				"delta": {
+					"type": "string"
+				},
+				"deltaHint": {
+					"type": "string"
+				},
+				"flow": {
+					"type": "string"
+				},
+				"flowHint": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"current": {
+					"type": "string"
+				},
+				"inflow": {
+					"type": "string"
+				},
+				"outflow": {
+					"type": "string"
+				},
+				"dwell": {
+					"type": "string"
+				},
+				"bottleneck": {
+					"type": "string"
+				},
+				"days": {
+					"type": "string"
+				},
+				"statusDistribution": {
+					"type": "string"
+				},
+				"weeklyHint": {
+					"type": "string"
+				},
+				"weekDetails": {
+					"type": "string"
+				},
+				"partial": {
+					"type": "string"
+				},
+				"noHistory": {
+					"type": "string"
+				},
+				"categories": {
+					"type": "string"
+				},
+				"categoryHint": {
+					"type": "string"
+				},
+				"uncategorized": {
+					"type": "string"
+				},
+				"composition": {
+					"type": "string"
+				},
+				"compositionHint": {
+					"type": "string"
+				},
+				"unsetType": {
+					"type": "string"
+				},
+				"workload": {
+					"type": "string"
+				},
+				"workloadHint": {
+					"type": "string"
+				},
+				"byPerson": {
+					"type": "string"
+				},
+				"specials": {
+					"type": "string"
+				},
+				"specialsHint": {
+					"type": "string"
+				},
+				"relationsError": {
+					"type": "string"
+				},
+				"specialCounts": {
+					"type": "string"
+				},
+				"snapshots": {
+					"type": "string"
+				},
+				"snapshotHint": {
+					"type": "string"
+				},
+				"snapshotName": {
+					"type": "string"
+				},
+				"saveSnapshot": {
+					"type": "string"
+				},
+				"snapshotSaved": {
+					"type": "string"
+				},
+				"snapshotBefore": {
+					"type": "string"
+				},
+				"snapshotAfter": {
+					"type": "string"
+				},
+				"compare": {
+					"type": "string"
+				},
+				"chooseSnapshot": {
+					"type": "string"
+				},
+				"view": {
+					"type": "string"
+				},
+				"more": {
+					"type": "string"
+				},
+				"noSnapshots": {
+					"type": "string"
+				},
+				"added": {
+					"type": "string"
+				},
+				"removed": {
+					"type": "string"
+				},
+				"changed": {
+					"type": "string"
+				},
+				"details": {
+					"type": "string"
+				},
+				"metric": {
+					"type": "string"
+				},
+				"quantity": {
+					"type": "string"
+				},
+				"coverage": {
+					"type": "string"
+				},
+				"completeHistory": {
+					"type": "string"
+				},
+				"weekly": {
+					"type": "string"
+				},
+				"week": {
+					"type": "string"
+				},
+				"charts": {
+					"type": "string"
+				},
+				"pdfPrint": {
+					"type": "string"
+				},
+				"exportError": {
+					"type": "string"
+				},
+				"from": {
+					"type": "string"
+				},
+				"to": {
+					"type": "string"
+				},
+				"export": {
+					"type": "string"
+				},
+				"invalidDates": {
+					"type": "string"
+				},
+				"asOf": {
+					"type": "string"
+				},
+				"scopeHint": {
+					"type": "string"
+				},
+				"returnLive": {
+					"type": "string"
+				},
+				"viewingSnapshot": {
+					"type": "string"
+				},
+				"historyHint": {
+					"type": "string"
+				},
+				"clearSelection": {
+					"type": "string"
+				},
+				"overdueTasks": {
+					"type": "string"
+				},
+				"overdueHint": {
+					"type": "string"
+				},
+				"dueSoon": {
+					"type": "string"
+				},
+				"twoBusinessDays": {
+					"type": "string"
+				},
+				"risks": {
+					"type": "string"
+				},
+				"riskHint": {
+					"type": "string"
+				},
+				"stale": {
+					"type": "string"
+				},
+				"staleThreshold": {
+					"type": "string"
+				},
+				"dayUnit": {
+					"type": "string"
+				},
+				"myTodo": {
+					"type": "string"
+				},
+				"overdueTrend": {
+					"type": "string"
+				},
+				"nodeRisks": {
+					"type": "string"
+				},
+				"noHistoryAtDate": {
+					"type": "string"
+				},
+				"presets": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"week": {
+							"type": "string"
+						},
+						"lastWeek": {
+							"type": "string"
+						},
+						"twelveWeeks": {
+							"type": "string"
+						}
+					},
+					"required": ["week", "lastWeek", "twelveWeeks"]
+				},
+				"series": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"created": {
+							"type": "string"
+						},
+						"pirun": {
+							"type": "string"
+						},
+						"prod": {
+							"type": "string"
+						},
+						"overdue": {
+							"type": "string"
+						},
+						"launched": {
+							"type": "string"
+						},
+						"unlaunched": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"created",
+						"pirun",
+						"prod",
+						"overdue",
+						"launched",
+						"unlaunched"
+					]
+				},
+				"risk": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"normal": {
+							"type": "string"
+						},
+						"soon": {
+							"type": "string"
+						},
+						"overdue": {
+							"type": "string"
+						},
+						"launched": {
+							"type": "string"
+						},
+						"closed": {
+							"type": "string"
+						},
+						"rejected": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"normal",
+						"soon",
+						"overdue",
+						"launched",
+						"closed",
+						"rejected"
+					]
+				},
+				"hint": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"all": {
+							"type": "string"
+						},
+						"active": {
+							"type": "string"
+						},
+						"acceptance": {
+							"type": "string"
+						},
+						"overdue": {
+							"type": "string"
+						}
+					},
+					"required": ["all", "active", "acceptance", "overdue"]
+				},
+				"columns": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"sequence": {
+							"type": "string"
+						},
+						"reference": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"type": {
+							"type": "string"
+						},
+						"category": {
+							"type": "string"
+						},
+						"workflow": {
+							"type": "string"
+						},
+						"assignee": {
+							"type": "string"
+						},
+						"creator": {
+							"type": "string"
+						},
+						"dueDate": {
+							"type": "string"
+						},
+						"pirun": {
+							"type": "string"
+						},
+						"overdueDays": {
+							"type": "string"
+						},
+						"risk": {
+							"type": "string"
+						},
+						"createdAt": {
+							"type": "string"
+						},
+						"updater": {
+							"type": "string"
+						},
+						"updatedAt": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"sequence",
+						"reference",
+						"title",
+						"description",
+						"type",
+						"category",
+						"workflow",
+						"assignee",
+						"creator",
+						"dueDate",
+						"pirun",
+						"overdueDays",
+						"risk",
+						"createdAt",
+						"updater",
+						"updatedAt"
+					]
+				},
+				"taskColumns": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"reference": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					},
+					"required": ["reference", "title", "description"]
+				},
+				"changedField": {
+					"type": "string"
+				},
+				"beforeValue": {
+					"type": "string"
+				},
+				"afterValue": {
+					"type": "string"
+				},
+				"requirementTable": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"projectBoard",
+				"requirementBoard",
+				"sourceFilter",
+				"sourceAll",
+				"sourceProject",
+				"sourceRequirement",
+				"overview",
+				"total",
+				"taskTotal",
+				"launched",
+				"overdue",
+				"active",
+				"acceptance",
+				"loading",
+				"loadError",
+				"retry",
+				"empty",
+				"unassigned",
+				"delivery",
+				"overdueDays",
+				"historicalRow",
+				"noBaseline",
+				"delta",
+				"deltaHint",
+				"flow",
+				"flowHint",
+				"status",
+				"current",
+				"inflow",
+				"outflow",
+				"dwell",
+				"bottleneck",
+				"days",
+				"statusDistribution",
+				"weeklyHint",
+				"weekDetails",
+				"partial",
+				"noHistory",
+				"categories",
+				"categoryHint",
+				"uncategorized",
+				"composition",
+				"compositionHint",
+				"unsetType",
+				"workload",
+				"workloadHint",
+				"byPerson",
+				"specials",
+				"specialsHint",
+				"relationsError",
+				"specialCounts",
+				"snapshots",
+				"snapshotHint",
+				"snapshotName",
+				"saveSnapshot",
+				"snapshotSaved",
+				"snapshotBefore",
+				"snapshotAfter",
+				"compare",
+				"chooseSnapshot",
+				"view",
+				"more",
+				"noSnapshots",
+				"added",
+				"removed",
+				"changed",
+				"details",
+				"metric",
+				"quantity",
+				"coverage",
+				"completeHistory",
+				"weekly",
+				"week",
+				"charts",
+				"pdfPrint",
+				"exportError",
+				"from",
+				"to",
+				"export",
+				"invalidDates",
+				"asOf",
+				"scopeHint",
+				"returnLive",
+				"viewingSnapshot",
+				"historyHint",
+				"clearSelection",
+				"overdueTasks",
+				"overdueHint",
+				"dueSoon",
+				"twoBusinessDays",
+				"risks",
+				"riskHint",
+				"stale",
+				"staleThreshold",
+				"dayUnit",
+				"myTodo",
+				"overdueTrend",
+				"nodeRisks",
+				"noHistoryAtDate",
+				"presets",
+				"series",
+				"risk",
+				"hint",
+				"columns",
+				"taskColumns",
+				"changedField",
+				"beforeValue",
+				"afterValue",
+				"requirementTable"
+			]
+		},
+		"ideas": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"subtitle": {
+					"type": "string"
+				},
+				"new": {
+					"type": "string"
+				},
+				"quickCapture": {
+					"type": "string"
+				},
+				"quickPlaceholder": {
+					"type": "string"
+				},
+				"capture": {
+					"type": "string"
+				},
+				"captured": {
+					"type": "string"
+				},
+				"emptyTitle": {
+					"type": "string"
+				},
+				"emptyHint": {
+					"type": "string"
+				},
+				"noResults": {
+					"type": "string"
+				},
+				"noResultsHint": {
+					"type": "string"
+				},
+				"emptyContent": {
+					"type": "string"
+				},
+				"all": {
+					"type": "string"
+				},
+				"allTags": {
+					"type": "string"
+				},
+				"filterState": {
+					"type": "string"
+				},
+				"filterTag": {
+					"type": "string"
+				},
+				"search": {
+					"type": "string"
+				},
+				"scopeHint": {
+					"type": "string"
+				},
+				"loading": {
+					"type": "string"
+				},
+				"loadError": {
+					"type": "string"
+				},
+				"retry": {
+					"type": "string"
+				},
+				"edit": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"namePlaceholder": {
+					"type": "string"
+				},
+				"state": {
+					"type": "string"
+				},
+				"content": {
+					"type": "string"
+				},
+				"contentPlaceholder": {
+					"type": "string"
+				},
+				"editorHint": {
+					"type": "string"
+				},
+				"tags": {
+					"type": "string"
+				},
+				"tagsPlaceholder": {
+					"type": "string"
+				},
+				"tagsHint": {
+					"type": "string"
+				},
+				"tagsError": {
+					"type": "string"
+				},
+				"pin": {
+					"type": "string"
+				},
+				"unpin": {
+					"type": "string"
+				},
+				"pinned": {
+					"type": "string"
+				},
+				"save": {
+					"type": "string"
+				},
+				"saved": {
+					"type": "string"
+				},
+				"saveError": {
+					"type": "string"
+				},
+				"uploading": {
+					"type": "string"
+				},
+				"conflict": {
+					"type": "string"
+				},
+				"discardTitle": {
+					"type": "string"
+				},
+				"discardHint": {
+					"type": "string"
+				},
+				"discard": {
+					"type": "string"
+				},
+				"adopt": {
+					"type": "string"
+				},
+				"saveFirst": {
+					"type": "string"
+				},
+				"convertHint": {
+					"type": "string"
+				},
+				"confirmConvert": {
+					"type": "string"
+				},
+				"converted": {
+					"type": "string"
+				},
+				"alreadyConverted": {
+					"type": "string"
+				},
+				"conversionConflict": {
+					"type": "string"
+				},
+				"convertError": {
+					"type": "string"
+				},
+				"viewTask": {
+					"type": "string"
+				},
+				"taskRemoved": {
+					"type": "string"
+				},
+				"unknownUser": {
+					"type": "string"
+				},
+				"recordedAt": {
+					"type": "string"
+				},
+				"previous": {
+					"type": "string"
+				},
+				"next": {
+					"type": "string"
+				},
+				"page": {
+					"type": "string"
+				},
+				"states": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"inbox": {
+							"type": "string"
+						},
+						"evaluating": {
+							"type": "string"
+						},
+						"adopted": {
+							"type": "string"
+						},
+						"parked": {
+							"type": "string"
+						}
+					},
+					"required": ["inbox", "evaluating", "adopted", "parked"]
+				}
+			},
+			"required": [
+				"title",
+				"subtitle",
+				"new",
+				"quickCapture",
+				"quickPlaceholder",
+				"capture",
+				"captured",
+				"emptyTitle",
+				"emptyHint",
+				"noResults",
+				"noResultsHint",
+				"emptyContent",
+				"all",
+				"allTags",
+				"filterState",
+				"filterTag",
+				"search",
+				"scopeHint",
+				"loading",
+				"loadError",
+				"retry",
+				"edit",
+				"name",
+				"namePlaceholder",
+				"state",
+				"content",
+				"contentPlaceholder",
+				"editorHint",
+				"tags",
+				"tagsPlaceholder",
+				"tagsHint",
+				"tagsError",
+				"pin",
+				"unpin",
+				"pinned",
+				"save",
+				"saved",
+				"saveError",
+				"uploading",
+				"conflict",
+				"discardTitle",
+				"discardHint",
+				"discard",
+				"adopt",
+				"saveFirst",
+				"convertHint",
+				"confirmConvert",
+				"converted",
+				"alreadyConverted",
+				"conversionConflict",
+				"convertError",
+				"viewTask",
+				"taskRemoved",
+				"unknownUser",
+				"recordedAt",
+				"previous",
+				"next",
+				"page",
+				"states"
+			]
 		}
 	},
 	"required": [
+		"requirements",
+		"todayChanges",
 		"common",
 		"auth",
 		"settings",
@@ -21565,6 +23045,8 @@
 		"publicProject",
 		"press",
 		"landing",
-		"mobile"
+		"mobile",
+		"reporting",
+		"ideas"
 	]
 }

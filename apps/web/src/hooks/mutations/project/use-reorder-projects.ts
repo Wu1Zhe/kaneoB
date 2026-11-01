@@ -44,12 +44,21 @@ function useReorderProjects() {
     ) => {
       const queryKey = ["projects", workspaceId];
       const previousProjects = queryClient.getQueryData<ProjectList>(queryKey);
+      const orderedIds = new Set(orderedProjects.map((project) => project.id));
+      let orderedIndex = 0;
+      const mergedProjects = previousProjects
+        ? previousProjects.map((project) =>
+            orderedIds.has(project.id)
+              ? orderedProjects[orderedIndex++]!
+              : project,
+          )
+        : orderedProjects;
 
       queryClient.setQueryData<ProjectList>(
         queryKey,
         // Positions rewritten, not just the array order, or a second drag
         // before the refetch sorts new indices against stale ones.
-        orderedProjects.map((project, index) => ({
+        mergedProjects.map((project, index) => ({
           ...project,
           position: index,
         })),

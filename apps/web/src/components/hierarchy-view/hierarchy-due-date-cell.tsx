@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { stopCardEvents } from "@/components/task-chips/stop-card-events";
 import TaskDueDatePopover from "@/components/task/task-due-date-popover";
 import { cn } from "@/lib/cn";
-import { formatDateMedium } from "@/lib/format";
+import { getDueDateStatus } from "@/lib/due-date-status";
+import { formatDateTime, formatDateTimeShort } from "@/lib/format";
 import type Task from "@/types/task";
 
 type HierarchyDueDateCellProps = {
@@ -12,11 +13,6 @@ type HierarchyDueDateCellProps = {
   isCompleted: boolean;
 };
 
-/**
- * The planned completion date plus, when the task is past due, how many days
- * it is late. Calendar days rather than elapsed hours: a date-only deadline
- * is overdue the next morning, not 24 hours after midnight.
- */
 export function HierarchyDueDateCell({
   task,
   isCompleted,
@@ -26,7 +22,7 @@ export function HierarchyDueDateCell({
   const overdueDays = dueDate
     ? differenceInCalendarDays(new Date(dueDate), new Date())
     : 0;
-  const overdue = overdueDays < 0 && !isCompleted;
+  const overdue = getDueDateStatus(dueDate, isCompleted) === "overdue";
 
   return (
     <TaskDueDatePopover task={task}>
@@ -34,7 +30,7 @@ export function HierarchyDueDateCell({
         type="button"
         title={
           dueDate
-            ? t("tasks:due.fullDate", { date: formatDateMedium(dueDate) })
+            ? t("tasks:due.fullDate", { date: formatDateTime(dueDate) })
             : undefined
         }
         className={cn(
@@ -45,9 +41,9 @@ export function HierarchyDueDateCell({
       >
         <Calendar aria-hidden="true" className="size-3 shrink-0" />
         <span className={cn("truncate", !overdue && "text-foreground")}>
-          {dueDate ? formatDateMedium(dueDate) : "—"}
+          {dueDate ? formatDateTimeShort(dueDate) : "—"}
         </span>
-        {overdue && (
+        {overdue && overdueDays < 0 && (
           <span className="shrink-0 font-medium">
             {t("tasks:due.overdueDays", { count: -overdueDays })}
           </span>

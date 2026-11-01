@@ -1,11 +1,13 @@
 import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import MobileProjectNav from "@/components/common/header/mobile-project-nav";
 import ProjectCrumbSelect from "@/components/common/header/project-crumb-select";
 import WorkspaceCrumbSelect from "@/components/common/header/workspace-crumb-select";
 import Layout from "@/components/common/layout";
+import { ProjectInsightsBar } from "@/components/project/insights";
 import { ProjectScopeToggle } from "@/components/project/views/project-scope-toggle";
 import {
   PROJECT_ROUTE_PATHS,
@@ -15,6 +17,9 @@ import {
 import { useGoToProjectView } from "@/components/project/views/use-go-to-project-view";
 import { useProjectViewShortcuts } from "@/components/project/views/use-project-view-shortcuts";
 import CreateProjectModal from "@/components/shared/modals/create-project-modal";
+import CreateTaskModal from "@/components/shared/modals/create-task-modal";
+import { Button } from "@/components/ui/button";
+import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -23,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useGetProject from "@/hooks/queries/project/use-get-project";
+import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import { useProjectWebSocket } from "@/hooks/use-project-websocket";
 import { cn } from "@/lib/cn";
 import { getProjectUnavailableReason } from "@/lib/project-unavailable-reason";
@@ -36,7 +42,6 @@ type ProjectLayoutProps = {
   toolbar?: ReactNode;
   summary?: ReactNode;
   filterBar?: ReactNode;
-  insights?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
   activeView?: ProjectRoute;
@@ -48,7 +53,6 @@ export default function ProjectLayout({
   toolbar,
   summary,
   filterBar,
-  insights,
   children,
   showViewSwitcher = true,
   activeView,
@@ -61,6 +65,12 @@ export default function ProjectLayout({
     workspaceId,
   });
   const unavailableReason = getProjectUnavailableReason(projectError);
+  const { data: overviewProject } = useGetTasks(projectId, {
+    refetchOnMount: false,
+  });
+  const { canCreateTasks } = useWorkspacePermission();
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  useEffect(() => setIsCreateTaskOpen(false), [projectId, workspaceId]);
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
     useState(false);
   const { background } = useBackgroundStore();
@@ -70,15 +80,19 @@ export default function ProjectLayout({
 
   const resolvedRoute: ProjectRoute =
     activeView ??
-    (location.pathname.includes("/backlog")
-      ? "backlog"
-      : location.pathname.includes("/calendar")
-        ? "calendar"
-        : location.pathname.includes("/gantt")
-          ? "gantt"
-          : location.pathname.includes("/hierarchy")
-            ? "hierarchy"
-            : "board");
+    (location.pathname.includes("/ideas")
+      ? "ideas"
+      : location.pathname.includes("/insights")
+        ? "insights"
+        : location.pathname.includes("/backlog")
+          ? "backlog"
+          : location.pathname.includes("/calendar")
+            ? "calendar"
+            : location.pathname.includes("/gantt")
+              ? "gantt"
+              : location.pathname.includes("/hierarchy")
+                ? "hierarchy"
+                : "board");
   const currentView = resolveProjectView(resolvedRoute, viewMode);
   const showViews = showViewSwitcher && !unavailableReason;
 
@@ -149,7 +163,17 @@ export default function ProjectLayout({
 
       {unavailableReason ? null : (
         <>
-          {insights}
+          {overviewProject && (
+            <ProjectInsightsBar
+              key={projectId}
+              project={overviewProject}
+              workspaceId={
+                resolvedRoute === "insights" || resolvedRoute === "ideas"
+                  ? workspaceId
+                  : undefined
+              }
+            />
+          )}
           <TooltipProvider>
             <div
               className={cn(
@@ -168,6 +192,21 @@ export default function ProjectLayout({
               {summary}
               <div className="ml-auto flex shrink-0 items-center gap-1">
                 {toolbar}
+                {project && resolvedRoute !== "ideas" && canCreateTasks() && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="ml-1 h-7 gap-1 px-2"
+                    title={t("common:modals.createTask.title")}
+                    aria-label={t("common:modals.createTask.title")}
+                    onClick={() => setIsCreateTaskOpen(true)}
+                  >
+                    <Plus className="size-3.5" />
+                    <span className="hidden sm:inline">
+                      {t("common:modals.createTask.title")}
+                    </span>
+                  </Button>
+                )}
               </div>
             </div>
             <div className={cn({ "bg-card/80 backdrop-blur": !!background })}>
@@ -189,9 +228,19 @@ export default function ProjectLayout({
       </Layout.Content>
 
       <CreateProjectModal
+        kind={project?.kind}
         open={isCreateProjectModalOpen}
         onClose={() => setIsCreateProjectModalOpen(false)}
       />
+      {!unavailableReason && project && canCreateTasks() && (
+        <CreateTaskModal
+          key={`${workspaceId}:${projectId}`}
+          projectId={projectId}
+          status={resolvedRoute === "backlog" ? "planned" : undefined}
+          open={isCreateTaskOpen}
+          onClose={() => setIsCreateTaskOpen(false)}
+        />
+      )}
     </Layout>
   );
 }

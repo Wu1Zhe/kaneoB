@@ -50,6 +50,7 @@ async function createTaskRelation({
         id: taskTable.id,
         projectId: taskTable.projectId,
         workspaceId: projectTable.workspaceId,
+        kind: projectTable.kind,
       })
       .from(taskTable)
       .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
@@ -70,6 +71,7 @@ async function createTaskRelation({
         id: taskTable.id,
         projectId: taskTable.projectId,
         workspaceId: projectTable.workspaceId,
+        kind: projectTable.kind,
       })
       .from(taskTable)
       .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
@@ -86,6 +88,13 @@ async function createTaskRelation({
     }
 
     await assertProjectAccess(userId, targetTask.projectId);
+    if (
+      relationType === "subtask" &&
+      (sourceTask.kind === "requirement" || targetTask.kind === "requirement")
+    )
+      throw new HTTPException(400, {
+        message: "Requirements cannot have subtasks or parents",
+      });
 
     const existing = await tx
       .select({ id: taskRelationTable.id })

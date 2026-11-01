@@ -92,6 +92,14 @@ afterEach(() => {
 });
 
 describe("board realtime races", () => {
+  it("refreshes today's changes after an activity has been stored", () => {
+    renderHook(() => useProjectWebSocket("p"));
+    Socket.current.message("ACTIVITY_CREATED", { taskId: "a" });
+    expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ["project-changes", "p"],
+    });
+  });
+
   it("clears a completed task's repeat rule and refreshes for its successor", async () => {
     const recurrence = { frequency: "weekly", interval: 1, timeZone: "UTC" };
     mocks.board = {

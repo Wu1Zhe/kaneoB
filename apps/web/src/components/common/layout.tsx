@@ -1,5 +1,7 @@
 import type React from "react";
 import type { ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
+import { i18n } from "@/lib/i18n";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DemoAlert } from "@/components/demo-alert";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -63,7 +65,9 @@ function Layout({ children, className }: LayoutProps) {
           } as React.CSSProperties
         }
       >
-        <AppSidebar />
+        <I18nextProvider i18n={i18n}>
+          <AppSidebar />
+        </I18nextProvider>
         <SidebarInset
           className={cn(
             "m-2 flex flex-1 flex-col overflow-auto rounded-xl border border-border/80 bg-background shadow-sm/5",

@@ -1,3 +1,4 @@
+import { RequirementContentFields } from "@/components/requirement/requirement-content-fields";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
@@ -44,12 +45,14 @@ export default function TaskDetailsContent({
     (rel) => rel.relationType === "subtask" && rel.targetTaskId === taskId,
   )?.sourceTask;
 
+  const isRequirement =
+    task?.projectKind === "requirement" || project?.kind === "requirement";
   if (!taskId) return null;
 
   return (
     <div className={cn("flex flex-col", className)}>
       <div className="flex flex-col gap-2.5 pb-4">
-        {parentTask && (
+        {!isRequirement && parentTask && (
           <button
             type="button"
             className="flex w-fit min-w-0 items-center gap-1.5 rounded-sm text-muted-foreground text-xs outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
@@ -72,15 +75,39 @@ export default function TaskDetailsContent({
             </span>
           </button>
         )}
+        {isRequirement && (
+          <p className="text-xs text-muted-foreground">
+            {t("tasks:requirement.nameRequired")}
+          </p>
+        )}
         <TaskTitle taskId={taskId} size={variant === "page" ? "lg" : "md"} />
       </div>
 
       {properties}
 
+      {isRequirement && task && (
+        <RequirementContentFields
+          task={task}
+          projectSlug={project?.slug ?? ""}
+          section="before"
+        />
+      )}
+      {isRequirement && (
+        <p className="mb-2 text-xs text-muted-foreground">
+          {t("tasks:requirement.descriptionRequired")}
+        </p>
+      )}
       <TaskDescription taskId={taskId} />
+      {isRequirement && task && (
+        <RequirementContentFields
+          task={task}
+          projectSlug={project?.slug ?? ""}
+          section="after"
+        />
+      )}
 
       <div className="mt-6 flex flex-col gap-6">
-        {task && (
+        {task && !isRequirement && (
           <TaskSubtasks
             taskId={taskId}
             projectId={projectId}

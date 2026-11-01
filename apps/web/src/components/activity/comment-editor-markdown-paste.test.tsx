@@ -98,6 +98,28 @@ beforeEach(() => {
 });
 
 describe("CommentEditor Markdown paste", () => {
+  it("hydrates a replacement editor when its placeholder and value change together", async () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <CommentEditor value="" onChange={onChange} placeholder="first" />,
+    );
+    await waitFor(() => expect(latestEditor()).toBeDefined());
+    const initial = latestEditor();
+    expect(() =>
+      rerender(
+        <CommentEditor
+          value="Loaded description"
+          onChange={onChange}
+          placeholder="translated"
+        />,
+      ),
+    ).not.toThrow();
+    await waitFor(() =>
+      expect(latestEditor().getText()).toBe("Loaded description"),
+    );
+    expect(initial.isDestroyed).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+  });
   it.each([
     "Status\n---\n22/tcp ALLOW Anywhere",
     "Status\n\n    22/tcp ALLOW Anywhere",

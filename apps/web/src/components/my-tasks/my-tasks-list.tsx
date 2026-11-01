@@ -67,6 +67,7 @@ export function MyTasksList({
                 key={task.id}
                 task={task}
                 workspaceId={workspaceId}
+                showSource
                 showLabels
               />
             ))}

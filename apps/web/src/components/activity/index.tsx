@@ -1,3 +1,4 @@
+import { describeRequirementChange } from "@/components/requirement/describe-requirement-change";
 import { Calendar, CircleAlert, Gauge, History, UserRound } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
@@ -174,6 +175,12 @@ function renderActivityContent({
 }) {
   const content = activity.content || "";
   const eventData = getEventDataRecord(activity.eventData);
+  if (activity.type.startsWith("requirement_") && eventData)
+    return (
+      <span className="text-muted-foreground">
+        {describeRequirementChange(eventData, t)}
+      </span>
+    );
 
   if (activity.type === "priority_changed") {
     if (eventData) {

@@ -57,6 +57,7 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
         const updateTaskFn = updateTaskRef.current;
 
         if (!currentTask || !updateTaskFn) return;
+        if (currentTask.projectKind === "requirement" && !title.trim()) return;
 
         try {
           await updateTaskFn({
@@ -98,6 +99,8 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
             rows={1}
             placeholder={t("tasks:detail.titlePlaceholder")}
             readOnly={!canEdit}
+            required={task?.projectKind === "requirement"}
+            aria-invalid={task?.projectKind === "requirement" && !title.trim()}
             className={cn(
               "block h-auto w-full resize-none appearance-none overflow-hidden border-0 bg-transparent p-0 font-heading font-semibold text-2xl text-foreground leading-[1.25] tracking-[-0.02em] outline-none placeholder:text-foreground/45",
               size === "lg" && "sm:text-[1.75rem] sm:leading-[1.2]",
@@ -117,6 +120,11 @@ export default function TaskTitle({ taskId, size = "md" }: TaskTitleProps) {
           />
         )}
       />
+      {task?.projectKind === "requirement" && !title.trim() && (
+        <p role="status" className="mt-1 text-xs text-destructive-foreground">
+          {t("tasks:requirement.required")}
+        </p>
+      )}
     </Form>
   );
 }

@@ -36,6 +36,9 @@ import {
 } from "./relations";
 import { resolveDatabaseConfig } from "./resolve-database-url";
 import {
+  ideaTable,
+  taskRevisionTable,
+  dashboardSnapshotTable,
   dataMigrationTable,
   storageCleanupTable,
   accountTable,
@@ -92,6 +95,9 @@ import {
 config();
 
 export const schema = {
+  ideaTable,
+  taskRevisionTable,
+  dashboardSnapshotTable,
   dataMigrationTable,
   storageCleanupTable,
   accountTable,

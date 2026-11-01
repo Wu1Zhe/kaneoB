@@ -128,9 +128,16 @@ function RouteComponent() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const { workspaceId } = Route.useParams();
   const navigate = useNavigate();
-  const { data: projects, isLoading } = useGetProjects({
+  const { data: allProjects, isLoading } = useGetProjects({
     workspaceId,
   });
+  const projects = useMemo(
+    () =>
+      allProjects?.filter(
+        (project) => (project.kind ?? "project") === "project",
+      ),
+    [allProjects],
+  );
   const reorderProjects = useReorderProjects();
 
   // React state, not the query cache: dnd-kit clears its transforms with a

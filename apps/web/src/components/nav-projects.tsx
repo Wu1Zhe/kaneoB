@@ -120,16 +120,24 @@ function SortableProjectItem({
   );
 }
 
-export function NavProjects() {
+export function NavProjects({
+  kind = "project",
+}: {
+  kind?: "project" | "requirement";
+}) {
   const { t } = useTranslation();
   const { isMobile } = useSidebar();
   const { data: workspace } = useActiveWorkspace();
-  const { data: projects } = useGetProjects(
+  const { data: allProjects } = useGetProjects(
     {
       workspaceId: workspace?.id || "",
     },
     true,
   );
+  const projects = allProjects?.filter(
+    (project) => (project.kind ?? "project") === kind,
+  );
+  const isRequirement = kind === "requirement";
   const queryClient = useQueryClient();
   const { mutateAsync: deleteProject } = useDeleteProject();
   const reorderProjects = useReorderProjects();
@@ -210,7 +218,13 @@ export function NavProjects() {
 
     if (oldIndex === -1 || newIndex === -1) return;
 
-    const reordered = arrayMove(projects, oldIndex, newIndex);
+    const reorderedGroup = arrayMove(projects, oldIndex, newIndex);
+    let groupIndex = 0;
+    const reordered = (allProjects ?? []).map((project) =>
+      (project.kind ?? "project") === kind
+        ? reorderedGroup[groupIndex++]!
+        : project,
+    );
 
     reorderProjects(workspace.id, reordered, {
       onError: () => {
@@ -231,18 +245,32 @@ export function NavProjects() {
               <SidebarGroupLabel className="h-7 cursor-pointer justify-start gap-1 px-0 text-sidebar-accent-foreground" />
             }
           >
-            <span>{t("navigation:sidebar.projects")}</span>
+            <span>
+              {t(
+                isRequirement
+                  ? "requirements:title"
+                  : "navigation:sidebar.projects",
+              )}
+            </span>
             <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/60 transition-transform duration-200" />
           </CollapsibleTrigger>
           {canCreate && (
             <SidebarGroupAction
               className="top-2 right-2 text-sidebar-foreground/70"
-              title={t("navigation:projectList.addProject")}
+              title={t(
+                isRequirement
+                  ? "requirements:add"
+                  : "navigation:projectList.addProject",
+              )}
               onClick={() => setIsCreateProjectModalOpen(true)}
             >
               <Plus />
               <span className="sr-only">
-                {t("navigation:projectList.addProject")}
+                {t(
+                  isRequirement
+                    ? "requirements:add"
+                    : "navigation:projectList.addProject",
+                )}
               </span>
             </SidebarGroupAction>
           )}
@@ -324,7 +352,11 @@ export function NavProjects() {
                               >
                                 <Folder className="text-muted-foreground" />
                                 <span>
-                                  {t("navigation:projectList.viewProject")}
+                                  {t(
+                                    isRequirement
+                                      ? "requirements:view"
+                                      : "navigation:projectList.viewProject",
+                                  )}
                                 </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -341,7 +373,11 @@ export function NavProjects() {
                               >
                                 <Forward className="text-muted-foreground" />
                                 <span>
-                                  {t("navigation:projectList.shareProject")}
+                                  {t(
+                                    isRequirement
+                                      ? "requirements:share"
+                                      : "navigation:projectList.shareProject",
+                                  )}
                                 </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -355,7 +391,11 @@ export function NavProjects() {
                               >
                                 <Settings className="text-muted-foreground" />
                                 <span>
-                                  {t("navigation:projectList.projectSettings")}
+                                  {t(
+                                    isRequirement
+                                      ? "requirements:settings"
+                                      : "navigation:projectList.projectSettings",
+                                  )}
                                 </span>
                               </DropdownMenuItem>
                               {canDeleteProject && (
@@ -371,7 +411,9 @@ export function NavProjects() {
                                     <Trash2 className="text-destructive" />
                                     <span>
                                       {t(
-                                        "navigation:projectList.deleteProject",
+                                        isRequirement
+                                          ? "requirements:delete"
+                                          : "navigation:projectList.deleteProject",
                                       )}
                                     </span>
                                   </DropdownMenuItem>
@@ -403,6 +445,7 @@ export function NavProjects() {
       </Collapsible>
 
       <CreateProjectModal
+        kind={kind}
         open={isCreateProjectModalOpen}
         onClose={() => setIsCreateProjectModalOpen(false)}
       />
@@ -414,10 +457,18 @@ export function NavProjects() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("navigation:projectList.deleteConfirmTitle")}
+              {t(
+                isRequirement
+                  ? "requirements:deleteConfirmTitle"
+                  : "navigation:projectList.deleteConfirmTitle",
+              )}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("navigation:projectList.deleteConfirmDescription")}
+              {t(
+                isRequirement
+                  ? "requirements:deleteConfirmDescription"
+                  : "navigation:projectList.deleteConfirmDescription",
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -433,9 +484,16 @@ export function NavProjects() {
                     await deleteProject({
                       id: projectToDeleteId || "",
                     });
-                    toast.success(t("navigation:projectList.deletedToast"), {
-                      icon: Trash2Icon,
-                    });
+                    toast.success(
+                      t(
+                        isRequirement
+                          ? "requirements:deleted"
+                          : "navigation:projectList.deletedToast",
+                      ),
+                      {
+                        icon: Trash2Icon,
+                      },
+                    );
                     queryClient.invalidateQueries({
                       queryKey: ["projects"],
                     });
@@ -449,7 +507,11 @@ export function NavProjects() {
                 />
               }
             >
-              {t("navigation:projectList.deleteProject")}
+              {t(
+                isRequirement
+                  ? "requirements:delete"
+                  : "navigation:projectList.deleteProject",
+              )}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogContent>

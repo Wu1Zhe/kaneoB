@@ -1,3 +1,7 @@
+import {
+  normalizeRequirementData,
+  validateRequirementContent,
+} from "../requirement-rules";
 import { extractAssetIds } from "../../storage/cleanup-assets";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -52,34 +56,62 @@ function deduplicateCustomFields(
   return Array.from(fieldsById.values());
 }
 
-async function createTask({
-  projectId,
-  currentUserId,
-  userId,
-  title,
-  status,
-  startDate,
-  dueDate,
-  description,
-  priority,
-  recurrence,
-  customFields,
-  draftAssetIds,
-}: {
-  projectId: string;
-  currentUserId: string;
-  userId?: string;
-  title: string;
-  status: string;
-  startDate?: Date;
-  dueDate?: Date;
-  description?: string;
-  priority?: string;
-  recurrence?: TaskRecurrence;
-  customFields?: CustomFieldInput[];
-  draftAssetIds?: string[];
-}) {
-  const resolvedStatus = status || "to-do";
+type TaskDatabase =
+  | typeof db
+  | Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+async function createTask(
+  {
+    projectId,
+    currentUserId,
+    userId,
+    title,
+    status,
+    startDate,
+    dueDate,
+    description,
+    priority,
+    recurrence,
+    customFields,
+    draftAssetIds,
+    requirementData,
+  }: {
+    projectId: string;
+    currentUserId: string;
+    userId?: string;
+    title: string;
+    status: string;
+    startDate?: Date;
+    dueDate?: Date;
+    description?: string;
+    priority?: string;
+    recurrence?: TaskRecurrence;
+    customFields?: CustomFieldInput[];
+    draftAssetIds?: string[];
+    requirementData?: Record<string, string | null>;
+  },
+  options?: { database?: TaskDatabase; deferEvent?: boolean },
+) {
+  const database = options?.database ?? db;
+  const container = await database.query.projectTable.findFirst({
+    where: eq(projectTable.id, projectId),
+  });
+  if (container?.kind === "requirement")
+    validateRequirementContent(title, description, requirementData?.type);
+  const normalizedRequirementData =
+    container?.kind === "requirement"
+      ? normalizeRequirementData({
+          ...requirementData,
+          ...(dueDate !== undefined
+            ? { prodPlannedAt: dueDate.toISOString() }
+            : {}),
+          ...(startDate !== undefined
+            ? { designStartPlannedAt: startDate.toISOString() }
+            : {}),
+        })
+      : null;
+  const resolvedStatus =
+    status || (container?.kind === "requirement" ? "backlog" : "to-do");
   const resolvedPriority = priority || "no-priority";
   const normalizedCustomFields = deduplicateCustomFields(customFields);
 
@@ -148,7 +180,7 @@ async function createTask({
       .where(eq(userTable.id, normalizedUserId));
   }
 
-  const column = await db.query.columnTable.findFirst({
+  const column = await database.query.columnTable.findFirst({
     where: and(
       eq(columnTable.projectId, projectId),
       eq(columnTable.slug, resolvedStatus),
@@ -160,7 +192,7 @@ async function createTask({
       message: "Create the task in an open column to make it repeat",
     });
 
-  const createdTask = await db.transaction(async (tx) => {
+  const createdTask = await database.transaction(async (tx) => {
     const taskNumber = await claimTaskNumber(projectId, tx);
     const nextPosition = await nextTaskPosition(
       tx,
@@ -175,6 +207,16 @@ async function createTask({
         projectId,
         userId: normalizedUserId ?? null,
         createdBy: currentUserId,
+        updatedBy: currentUserId,
+        requirementData:
+          container?.kind === "requirement"
+            ? {
+                ...normalizedRequirementData,
+                reference:
+                  normalizedRequirementData?.reference ||
+                  `${container.slug}-${taskNumber}`,
+              }
+            : null,
         title: title || "",
         status: resolvedStatus,
         columnId: column?.id ?? null,
@@ -245,6 +287,19 @@ async function createTask({
     });
   }
 
+  if (!options?.deferEvent)
+    await publishTaskCreated(createdTask, currentUserId);
+
+  return {
+    ...createdTask,
+    assigneeName: assignee?.name,
+  };
+}
+
+export async function publishTaskCreated(
+  createdTask: typeof taskTable.$inferSelect,
+  currentUserId: string,
+) {
   await publishEvent("task.created", {
     ...createdTask,
     taskId: createdTask.id,
@@ -253,11 +308,6 @@ async function createTask({
     type: "created",
     content: null,
   });
-
-  return {
-    ...createdTask,
-    assigneeName: assignee?.name,
-  };
 }
 
 export default createTask;

@@ -1,4 +1,6 @@
+import { RequirementList } from "@/components/requirement/requirement-list";
 import { useCallback, useMemo, useState } from "react";
+import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import useGetProjectTaskRelations from "@/hooks/queries/task-relation/use-get-project-task-relations";
@@ -21,12 +23,13 @@ export function HierarchyView({
   onOpenTask,
 }: HierarchyViewProps) {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
   const {
     data: relations,
     isLoading: relationsLoading,
     isError: relationsFailed,
     refetch: refetchRelations,
-  } = useGetProjectTaskRelations(project.id);
+  } = useGetProjectTaskRelations(isRequirement ? "" : project.id);
 
   // Board order: columns in their configured order, tasks by position within
   // each column. A child keeps its place under its parent rather than under
@@ -42,8 +45,8 @@ export function HierarchyView({
   );
 
   const children = useMemo(
-    () => buildSubtaskChildren(relations ?? []),
-    [relations],
+    () => buildSubtaskChildren(isRequirement ? [] : (relations ?? [])),
+    [relations, isRequirement],
   );
 
   const roots = useMemo(
@@ -86,9 +89,12 @@ export function HierarchyView({
     });
   }, []);
 
+  if (isRequirement)
+    return <RequirementList project={project} onOpenTask={onOpenTask} />;
+
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {relationsFailed && (
+      {!isRequirement && relationsFailed && (
         // Without relations every task renders as a root, which reads exactly
         // like a project with no subtasks; this says it isn't.
         <div

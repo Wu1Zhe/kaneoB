@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import type { AssignedTask } from "@/fetchers/task/get-assigned-tasks";
 import { getColumnIcon } from "@/lib/column";
@@ -10,19 +11,37 @@ type AssignedTaskRowProps = {
   task: AssignedTask;
   workspaceId: string;
   showLabels?: boolean;
+  showSource?: boolean;
 };
 
 export function AssignedTaskRow({
   task,
   workspaceId,
   showLabels = false,
+  showSource = false,
 }: AssignedTaskRowProps) {
+  const { t } = useTranslation();
   return (
     <Link
       to="/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId"
       params={{ workspaceId, projectId: task.projectId, taskId: task.id }}
       className="flex h-11 items-center gap-2.5 border-border/50 border-b px-1 outline-none transition-colors hover:bg-accent/50 focus-visible:bg-accent/50"
     >
+      {showSource && (
+        <span
+          className={
+            task.projectKind === "requirement"
+              ? "shrink-0 rounded bg-violet-500/10 px-1.5 py-0.5 text-xs text-violet-600 dark:text-violet-300"
+              : "shrink-0 rounded bg-blue-500/10 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-300"
+          }
+        >
+          {t(
+            task.projectKind === "requirement"
+              ? "reporting:sourceRequirement"
+              : "reporting:sourceProject",
+          )}
+        </span>
+      )}
       <span className="flex w-4 shrink-0 justify-center [&_svg]:size-3.5">
         {getPriorityIcon(task.priority)}
       </span>

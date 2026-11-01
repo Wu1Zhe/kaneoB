@@ -20,10 +20,13 @@ export function HomeProjects({
 }: HomeProjectsProps) {
   const { t } = useTranslation();
   const {
-    data: projects,
+    data: allProjects,
     isPending,
     isError,
   } = useGetProjects({ workspaceId }, true);
+  const projects = allProjects?.filter(
+    (project) => (project.kind ?? "project") === "project",
+  );
 
   return (
     <section className="flex flex-col gap-3">

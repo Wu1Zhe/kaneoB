@@ -13,6 +13,10 @@ import createComment from "./controllers/create-comment";
 import deleteComment from "./controllers/delete-comment";
 import getActivities from "./controllers/get-activities";
 import getWorkspaceActivities from "./controllers/get-workspace-activities";
+import getProjectChanges from "./controllers/get-project-changes";
+import { projectParam } from "../project/schema";
+import { projectChangesQuery } from "./schema";
+import { projectChangesSchema } from "./response";
 import updateComment from "./controllers/update-comment";
 import {
   activityListSchema,
@@ -48,6 +52,48 @@ const getWorkspaceActivitiesRoute = createRoute({
       workspaceActivityListSchema,
     ),
     403: errorResponse("Missing project:read or task:read permission"),
+    404: errorResponse("Workspace not found"),
+  },
+});
+
+const getProjectChangesRoute = createRoute({
+  method: "get",
+  operationId: "getProjectChanges",
+  path: "/project/{id}/changes",
+  tags: ["Activity"],
+  summary: "Get project or requirement task changes for a day",
+  description:
+    "Return status, due date, assignee and priority changes within the requested local-day UTC boundaries, newest first. Projects also include progress; requirements include node planned and actual completion times instead. Use nextCursor to load more.",
+  middleware: [
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["read"], task: ["read"] }),
+  ] as const,
+  request: { params: projectParam, query: projectChangesQuery },
+  responses: {
+    200: jsonResponse("Task changes", projectChangesSchema),
+    400: errorResponse("Invalid window or cursor"),
+    403: errorResponse("Missing read permission"),
+    404: errorResponse("Project not found"),
+  },
+});
+
+const getPersonalChangesRoute = createRoute({
+  method: "get",
+  operationId: "getPersonalTaskChanges",
+  path: "/workspace/{workspaceId}/my-changes",
+  tags: ["Activity"],
+  summary: "Get today's changes to tasks assigned to me",
+  description:
+    "Five change categories for tasks currently assigned to the authenticated caller in readable active projects and requirements, within the requested local-day UTC boundaries.",
+  middleware: [
+    workspaceAccess.fromParam(),
+    requireWorkspacePermission({ project: ["read"], task: ["read"] }),
+  ] as const,
+  request: { params: workspaceIdParam, query: projectChangesQuery },
+  responses: {
+    200: jsonResponse("Personal task changes", projectChangesSchema),
+    400: errorResponse("Invalid window or cursor"),
+    403: errorResponse("Missing read permission"),
     404: errorResponse("Workspace not found"),
   },
 });
@@ -185,11 +231,32 @@ const deleteCommentRoute = createRoute({
 });
 
 const activity = apiRouter()
+  .openapi(getProjectChangesRoute, async (c) =>
+    c.json(
+      await getProjectChanges(
+        { projectId: c.req.valid("param").id },
+        c.req.valid("query"),
+      ),
+      200,
+    ),
+  )
   .openapi(getWorkspaceActivitiesRoute, async (c) =>
     c.json(
       await getWorkspaceActivities(
         c.req.valid("param").workspaceId,
         c.get("userId"),
+      ),
+      200,
+    ),
+  )
+  .openapi(getPersonalChangesRoute, async (c) =>
+    c.json(
+      await getProjectChanges(
+        {
+          workspaceId: c.req.valid("param").workspaceId,
+          userId: c.get("userId"),
+        },
+        c.req.valid("query"),
       ),
       200,
     ),

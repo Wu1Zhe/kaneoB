@@ -28,7 +28,7 @@ export function SubtasksChip({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const counts = task.subtaskCounts;
-  if (!counts?.total) return null;
+  if (task.projectKind === "requirement" || !counts?.total) return null;
 
   const openTask = (subtask: Pick<Task, "id" | "projectId">) => {
     setOpen(false);

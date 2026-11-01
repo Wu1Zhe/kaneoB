@@ -58,6 +58,20 @@ export function formatDateMedium(value: DateInput, locale?: string) {
   );
 }
 
+export function formatDateTimeShort(value: DateInput, locale?: string) {
+  return formatDate(
+    value,
+    {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    },
+    locale,
+  );
+}
+
 /** Locale-aware full date and time (for tooltips next to relative labels like "yesterday"). */
 export function formatDateTime(value: DateInput, locale?: string) {
   return formatDate(

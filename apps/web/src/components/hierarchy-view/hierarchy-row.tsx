@@ -1,4 +1,6 @@
+import { RequirementNodeTimes } from "@/components/requirement/requirement-node-times";
 import { ChevronRight } from "lucide-react";
+import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useTranslation } from "react-i18next";
 import { AssigneeAvatar } from "@/components/task/properties/assignee-avatar";
 import TaskPriorityPopover from "@/components/task/task-priority-popover";
@@ -63,6 +65,7 @@ export function HierarchyRow({
   onOpenTask,
 }: HierarchyRowProps) {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
   const hoverPrefetch = useTaskHoverPrefetch(task.id);
   const { showTaskNumbers, showLabels, showTaskItemCounts } =
     useUserPreferencesStore();
@@ -137,7 +140,9 @@ export function HierarchyRow({
         <div className="flex min-w-0 flex-1 items-center gap-2 px-2">
           {showTaskNumbers && (
             <span className="w-13 shrink-0 truncate font-mono text-muted-foreground text-xs">
-              {projectSlug}-{task.number}
+              {isRequirement && task.requirementData?.reference
+                ? task.requirementData.reference
+                : `${projectSlug}-${task.number}`}
             </span>
           )}
           <span className="truncate text-foreground text-sm">{task.title}</span>
@@ -221,25 +226,36 @@ export function HierarchyRow({
           )}
         </div>
 
-        <div className={cn(HIERARCHY_CELL_CLASS, progressColumn.widthClass)}>
-          <HierarchyProgress value={progress} />
+        <div
+          className={cn(
+            HIERARCHY_CELL_CLASS,
+            isRequirement ? "w-[11rem]" : progressColumn.widthClass,
+          )}
+        >
+          {isRequirement ? (
+            <RequirementNodeTimes task={task} />
+          ) : (
+            <HierarchyProgress value={progress} />
+          )}
         </div>
 
         <div className={cn(HIERARCHY_CELL_CLASS, dueDateColumn.widthClass)}>
           <HierarchyDueDateCell task={task} isCompleted={isCompleted} />
         </div>
 
-        <div className={cn(HIERARCHY_CELL_CLASS, subtasksColumn.widthClass)}>
-          {task.subtaskCounts?.total ? (
-            <SubtasksChip
-              task={task}
-              workspaceId={workspaceId}
-              className="h-5"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">—</span>
-          )}
-        </div>
+        {!isRequirement && (
+          <div className={cn(HIERARCHY_CELL_CLASS, subtasksColumn.widthClass)}>
+            {task.subtaskCounts?.total ? (
+              <SubtasksChip
+                task={task}
+                workspaceId={workspaceId}
+                className="h-5"
+              />
+            ) : (
+              <span className="text-muted-foreground text-xs">—</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

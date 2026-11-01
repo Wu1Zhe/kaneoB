@@ -1,13 +1,27 @@
+import { taskDeadlines } from "@/components/requirement/requirement-deadlines";
+import type { RequirementStage } from "@/components/requirement/requirement-fields";
 import { format, startOfDay, subDays } from "date-fns";
 import { isTaskCompleted } from "@/lib/due-date-status";
+import { getStatusDisplayLabel } from "@/lib/i18n/domain";
 import type Task from "@/types/task";
-import type { ProjectWithTasks } from "@/types/project";
 
 export type InsightColumn = {
   slug: string;
   name: string;
   isFinal: boolean;
 };
+
+export type InsightTask = Task & { insightStatus?: string };
+export type InsightProject = {
+  id: string;
+  columns: Array<InsightColumn & { tasks: InsightTask[] }>;
+  plannedTasks?: InsightTask[];
+  archivedTasks?: InsightTask[];
+};
+
+function statusOf(task: InsightTask) {
+  return task.insightStatus ?? task.status;
+}
 
 export type StatusCount = InsightColumn & { count: number };
 
@@ -17,15 +31,16 @@ export type PersonStatusRow = {
   image: string | null;
   counts: Record<string, number>;
   total: number;
-  tasks: Task[];
+  tasks: InsightTask[];
 };
 
 export type OverdueBand = "overdue" | "soon";
 
 export type OverdueEntry = {
-  task: Task;
+  task: InsightTask;
   /** Positive for an overdue task, positive time remaining for a soon task. */
   distanceMs: number;
+  stage?: RequirementStage;
 };
 
 export type TrendPoint = {
@@ -54,20 +69,33 @@ const priorityRank: Record<string, number> = {
   low: 1,
 };
 
-export function getInsightColumns(project: ProjectWithTasks): InsightColumn[] {
-  return project.columns.map((column) => ({
+export function getInsightColumns(project: InsightProject): InsightColumn[] {
+  const columns = project.columns.map((column) => ({
     slug: column.slug,
     name: column.name,
     isFinal: column.isFinal,
   }));
+  for (const [slug, tasks, isFinal] of [
+    ["planned", project.plannedTasks, false],
+    ["archived", project.archivedTasks, true],
+  ] as const) {
+    if (tasks?.length && !columns.some((column) => column.slug === slug)) {
+      columns.push({ slug, name: getStatusDisplayLabel(slug), isFinal });
+    }
+  }
+  return columns;
 }
 
 /** Each task once, even if a column view repeats it. */
-export function collectInsightTasks(project: ProjectWithTasks): Task[] {
+export function collectInsightTasks(project: InsightProject): InsightTask[] {
   const seen = new Set<string>();
-  const tasks: Task[] = [];
-  for (const column of project.columns) {
-    for (const task of column.tasks) {
+  const tasks: InsightTask[] = [];
+  for (const group of [
+    ...project.columns.map((column) => column.tasks),
+    project.plannedTasks ?? [],
+    project.archivedTasks ?? [],
+  ]) {
+    for (const task of group) {
       if (seen.has(task.id)) continue;
       seen.add(task.id);
       tasks.push(task);
@@ -76,8 +104,10 @@ export function collectInsightTasks(project: ProjectWithTasks): Task[] {
   return tasks;
 }
 
-function isCompleted(task: Task, columns: InsightColumn[]) {
-  return isTaskCompleted(task.status, columns);
+function isCompleted(task: InsightTask, columns: InsightColumn[]) {
+  if (task.projectKind === "requirement" && task.requirementData?.prodActualAt)
+    return true;
+  return isTaskCompleted(statusOf(task), columns);
 }
 
 export function getOverdueEntries(
@@ -88,12 +118,13 @@ export function getOverdueEntries(
 ): OverdueEntry[] {
   const entries: OverdueEntry[] = [];
   for (const task of tasks) {
-    if (!task.dueDate || isCompleted(task, columns)) continue;
-    const remaining = new Date(task.dueDate).getTime() - now.getTime();
-    if (band === "overdue" && remaining < 0) {
-      entries.push({ task, distanceMs: -remaining });
-    } else if (band === "soon" && remaining >= 0 && remaining <= DAY_MS) {
-      entries.push({ task, distanceMs: remaining });
+    if (isCompleted(task, columns)) continue;
+    for (const deadline of taskDeadlines(task)) {
+      const remaining = new Date(deadline.date).getTime() - now.getTime();
+      if (band === "overdue" && remaining < 0)
+        entries.push({ task, stage: deadline.stage, distanceMs: -remaining });
+      else if (band === "soon" && remaining >= 0 && remaining <= DAY_MS)
+        entries.push({ task, stage: deadline.stage, distanceMs: remaining });
     }
   }
 
@@ -115,7 +146,8 @@ export function buildStatusCounts(
 ): StatusCount[] {
   const counts = new Map<string, number>();
   for (const task of tasks) {
-    counts.set(task.status, (counts.get(task.status) ?? 0) + 1);
+    const status = statusOf(task);
+    counts.set(status, (counts.get(status) ?? 0) + 1);
   }
   return columns.map((column) => ({
     ...column,
@@ -142,7 +174,8 @@ export function buildPeopleTable(
       };
       rows.set(key, row);
     }
-    row.counts[task.status] = (row.counts[task.status] ?? 0) + 1;
+    const status = statusOf(task);
+    row.counts[status] = (row.counts[status] ?? 0) + 1;
     row.total += 1;
     row.tasks.push(task);
   }
@@ -152,8 +185,8 @@ export function buildPeopleTable(
   );
   for (const row of rows.values()) {
     row.tasks.sort((a, b) => {
-      const aOrder = columnOrder.get(a.status) ?? Number.MAX_SAFE_INTEGER;
-      const bOrder = columnOrder.get(b.status) ?? Number.MAX_SAFE_INTEGER;
+      const aOrder = columnOrder.get(statusOf(a)) ?? Number.MAX_SAFE_INTEGER;
+      const bOrder = columnOrder.get(statusOf(b)) ?? Number.MAX_SAFE_INTEGER;
       if (aOrder !== bOrder) return aOrder - bOrder;
       return a.title.localeCompare(b.title);
     });
@@ -179,7 +212,11 @@ export function summarizeTasks(
       completed += 1;
       continue;
     }
-    if (task.dueDate && new Date(task.dueDate).getTime() < now.getTime()) {
+    if (
+      taskDeadlines(task).some(
+        ({ date }) => new Date(date).getTime() < now.getTime(),
+      )
+    ) {
       overdue += 1;
     }
   }

@@ -2,7 +2,7 @@ import { TZDate } from "@date-fns/tz";
 import { Repeat } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { DatePickerMenu } from "@/components/common/date-picker/date-picker-menu";
+import { DateTimePickerMenu } from "@/components/common/date-picker/date-time-picker-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { defaultRecurrence } from "@/lib/default-recurrence";
@@ -41,7 +41,8 @@ export default function TaskDueDatePicker({
 
   return (
     <>
-      <DatePickerMenu
+      <DateTimePickerMenu
+        key={dueDate?.getTime() ?? "empty"}
         label={label}
         placeholder={t("tasks:datePicker.dueDatePlaceholder")}
         clearLabel={clearLabel}

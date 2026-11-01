@@ -41,6 +41,7 @@ import deleteTask from "./controllers/delete-task";
 import duplicateTask from "./controllers/duplicate-task";
 import exportTasks from "./controllers/export-tasks";
 import getAssignedTasks from "./controllers/get-assigned-tasks";
+import getPersonalInsightTasks from "./controllers/get-personal-insight-tasks";
 import getTaskByTicketId from "./controllers/get-task-by-ticket-id";
 import getTask from "./controllers/get-task";
 import getTasks from "./controllers/get-tasks";
@@ -65,6 +66,8 @@ import updateTaskPriority from "./controllers/update-task-priority";
 import updateTaskRecurrence from "./controllers/update-task-recurrence";
 import updateTaskStatus from "./controllers/update-task-status";
 import updateTaskTitle from "./controllers/update-task-title";
+import updateRequirementField from "./controllers/update-requirement-field";
+import { updateRequirementFieldBody } from "./requirement-fields";
 import updateTaskTracking from "./controllers/update-task-tracking";
 import {
   getDeferredDescriptionMatches,
@@ -73,6 +76,7 @@ import {
 import "./recurrence/subscribe";
 import {
   assignedTasksSchema,
+  personalInsightTasksSchema,
   boardSchema,
   bulkResultSchema,
   descriptionMatchesSchema,
@@ -88,6 +92,7 @@ import {
 } from "./response";
 import {
   assignedTasksQuery,
+  personalInsightTasksQuery,
   bulkUpdateBody,
   createTaskBody,
   descriptionMatchesQuery,
@@ -115,6 +120,27 @@ import {
   updateTitleBody,
   updateTrackingBody,
 } from "./schema";
+
+const personalInsightTasksRoute = createRoute({
+  method: "get",
+  operationId: "getPersonalInsightTasks",
+  path: "/assigned/insights",
+  tags: ["Tasks"],
+  summary: "Page all tasks assigned to me for personal statistics",
+  description:
+    "Includes completed and archived tasks in readable active projects and requirements. The assignee is always the authenticated caller. Follow nextCursor to read the complete set, ordered by task ID.",
+  middleware: [
+    workspaceAccess.fromQuery(),
+    requireWorkspacePermission({ project: ["read"], task: ["read"] }),
+  ] as const,
+  request: { query: personalInsightTasksQuery },
+  responses: {
+    200: jsonResponse("Personal insight task page", personalInsightTasksSchema),
+    400: errorResponse("Invalid query"),
+    403: errorResponse("Missing read permission"),
+    404: errorResponse("Workspace not found"),
+  },
+});
 
 const listAssignedTasksRoute = createRoute({
   method: "get",
@@ -644,6 +670,34 @@ const updateTaskDueDateRoute = createRoute({
   },
 });
 
+const updateRequirementFieldRoute = createRoute({
+  method: "put",
+  path: "/requirement/{id}",
+  operationId: "updateRequirementField",
+  tags: ["Tasks"],
+  summary: "Update one requirement field",
+  description:
+    "Only available in requirement containers. Planned times use half-hour intervals; actual times allow any minute. Clearing a field records its previous value in activity history.",
+  middleware: [
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+    requireEntitlement,
+  ] as const,
+  request: {
+    params: taskParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: updateRequirementFieldBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("The updated requirement", taskSchema),
+    400: errorResponse("Invalid requirement field"),
+    403: errorResponse("Missing task update permission"),
+    404: errorResponse("Task not found"),
+  },
+});
+
 const updateTaskTrackingRoute = createRoute({
   method: "put",
   operationId: "updateTaskTracking",
@@ -887,13 +941,20 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     );
   })
   // Registered ahead of the `/{id}` routes, which would otherwise claim it.
+  .openapi(personalInsightTasksRoute, async (c) =>
+    c.json(
+      await getPersonalInsightTasks(c.get("userId"), c.req.valid("query")),
+      200,
+    ),
+  )
   .openapi(listAssignedTasksRoute, async (c) => {
-    const { workspaceId, countOnly } = c.req.valid("query");
+    const { workspaceId, countOnly, kind } = c.req.valid("query");
     return c.json(
       await getAssignedTasks(
         workspaceId,
         c.get("userId"),
         countOnly === "true",
+        kind,
       ),
       200,
     );
@@ -974,6 +1035,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       recurrence,
       customFields,
       draftAssetIds,
+      requirementData,
     } = c.req.valid("json");
 
     const parsedStartDate =
@@ -1000,6 +1062,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       recurrence,
       customFields,
       draftAssetIds,
+      requirementData,
     });
 
     return c.json(task, 200);
@@ -1161,6 +1224,16 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
 
     return c.json(task, 200);
   })
+  .openapi(updateRequirementFieldRoute, async (c) =>
+    c.json(
+      await updateRequirementField(
+        c.req.valid("param").id,
+        c.get("userId"),
+        c.req.valid("json"),
+      ),
+      200,
+    ),
+  )
   .openapi(updateTaskTrackingRoute, async (c) => {
     const { id } = c.req.valid("param");
     const { progress, weight, actualStartAt, actualEndAt } =

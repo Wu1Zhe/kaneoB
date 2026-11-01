@@ -1,7 +1,7 @@
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DatePickerMenu } from "@/components/common/date-picker/date-picker-menu";
+import { DateTimePickerMenu } from "@/components/common/date-picker/date-time-picker-menu";
 import {
   Popover,
   PopoverContent,
@@ -57,7 +57,7 @@ export function BulkDueDatePopover({
         className="w-65 p-0"
         finalFocus={() => (openedByRequest() && returnFocus?.()) || true}
       >
-        <DatePickerMenu
+        <DateTimePickerMenu
           label={label}
           placeholder={t("tasks:datePicker.dueDatePlaceholder")}
           clearLabel={t("tasks:dueDate.clear")}

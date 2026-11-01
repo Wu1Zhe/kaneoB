@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-import { columnTable, taskTable } from "../../database/schema";
+import { columnTable, projectTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { getSubtaskParentProjects } from "../get-subtask-parent-projects";
 import { publishTaskMutation } from "./task-mutation-effects";
@@ -26,6 +26,15 @@ async function updateTaskTracking({
   const { before: existingTask, after: updatedTask } = await withLockedTask(
     id,
     async (tx, existingTask) => {
+      if (progress !== undefined || weight !== undefined) {
+        const project = await tx.query.projectTable.findFirst({
+          where: eq(projectTable.id, existingTask.projectId),
+        });
+        if (project?.kind === "requirement")
+          throw new HTTPException(400, {
+            message: "Requirements do not track progress or weight",
+          });
+      }
       const changes: Partial<typeof taskTable.$inferInsert> = {};
 
       if (progress !== undefined) changes.progress = progress;

@@ -176,7 +176,7 @@ async function duplicateTask({
   }
 
   const [project] = await db
-    .select({ workspaceId: projectTable.workspaceId })
+    .select({ workspaceId: projectTable.workspaceId, kind: projectTable.kind })
     .from(projectTable)
     .where(eq(projectTable.id, sourceTask.projectId))
     .limit(1);
@@ -274,28 +274,35 @@ async function duplicateTask({
 
   // A duplicated subtask stays a subtask of the same parents. The source's own
   // subtasks are not duplicated: a copy is one task, not a tree.
-  const parentRelations = await db
-    .select({
-      parentTaskId: taskRelationTable.sourceTaskId,
-      parentProjectId: taskTable.projectId,
-      relationType: taskRelationTable.relationType,
-    })
-    .from(taskRelationTable)
-    .innerJoin(taskTable, eq(taskRelationTable.sourceTaskId, taskTable.id))
-    .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
-    .where(
-      and(
-        eq(taskRelationTable.targetTaskId, sourceTask.id),
-        eq(projectTable.workspaceId, project.workspaceId),
-        eq(taskRelationTable.relationType, "subtask"),
-        // An occurrence continues its series with the links it already had,
-        // whoever completed it; only a manual copy is limited to what the
-        // user can see.
-        occurrence
-          ? undefined
-          : projectAccessCondition(currentUserId, taskTable.projectId),
-      ),
-    );
+  const parentRelations =
+    project.kind === "requirement"
+      ? []
+      : await db
+          .select({
+            parentTaskId: taskRelationTable.sourceTaskId,
+            parentProjectId: taskTable.projectId,
+            relationType: taskRelationTable.relationType,
+          })
+          .from(taskRelationTable)
+          .innerJoin(
+            taskTable,
+            eq(taskRelationTable.sourceTaskId, taskTable.id),
+          )
+          .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
+          .where(
+            and(
+              eq(taskRelationTable.targetTaskId, sourceTask.id),
+              eq(projectTable.workspaceId, project.workspaceId),
+              eq(projectTable.kind, "project"),
+              eq(taskRelationTable.relationType, "subtask"),
+              // An occurrence continues its series with the links it already had,
+              // whoever completed it; only a manual copy is limited to what the
+              // user can see.
+              occurrence
+                ? undefined
+                : projectAccessCondition(currentUserId, taskTable.projectId),
+            ),
+          );
 
   if (parentRelations.length > 0 && !canUpdateTasks) {
     throw new HTTPException(403, {
@@ -391,6 +398,7 @@ async function duplicateTask({
           description,
           priority: sourceTask.priority,
           weight: sourceTask.weight,
+          requirementData: sourceTask.requirementData,
           number: taskNumber,
           position: nextPosition,
         })

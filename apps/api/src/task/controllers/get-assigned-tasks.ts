@@ -34,12 +34,15 @@ async function getAssignedTasks(
   workspaceId: string,
   userId: string,
   countOnly = false,
+  kind?: "project" | "requirement",
 ) {
   const openAndMine = and(
+    kind ? eq(projectTable.kind, kind) : undefined,
     eq(projectTable.workspaceId, workspaceId),
     isNull(projectTable.archivedAt),
     eq(taskTable.userId, userId),
     ne(taskTable.status, "archived"),
+    sql`not (${projectTable.kind} = 'requirement' and nullif(${taskTable.requirementData}->>'prodActualAt','') is not null)`,
     sql`not coalesce((
       select ${columnTable.isFinal} from ${columnTable}
       where ${columnTable.id} = ${taskTable.columnId}
@@ -84,6 +87,7 @@ async function getAssignedTasks(
       .select({
         id: taskTable.id,
         projectId: taskTable.projectId,
+        projectKind: projectTable.kind,
         number: taskTable.number,
         title: taskTable.title,
         status: taskTable.status,

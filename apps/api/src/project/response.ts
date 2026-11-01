@@ -4,6 +4,10 @@ import { boardColumnSchema, boardTaskSchema } from "../task/response";
 
 export const projectSchema = z
   .object({
+    kind: z.enum(["project", "requirement"]).optional().openapi({
+      description:
+        "Project category. Older clients and cached data default to project.",
+    }),
     id: z.string(),
     workspaceId: z.string(),
     backgroundVersion: z.string().nullable(),

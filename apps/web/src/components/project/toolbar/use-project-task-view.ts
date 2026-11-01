@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useFilterSubjects } from "@/components/project/task-filters/use-filter-subjects";
 import { useTaskFilterOptions } from "@/components/project/task-filters/use-task-filter-options";
 import { useDescriptionMatches } from "@/hooks/queries/task/use-description-matches";
 import type { BoardFilters } from "@/hooks/use-task-filters";
 import { useTaskFiltersWithLabelsSupport } from "@/hooks/use-task-filters-with-labels-support";
 import type { ProjectWithTasks } from "@/types/project";
+import { useSessionState } from "@/hooks/use-session-state";
 import { scopeTasks } from "./scope-tasks";
 
 const NO_IGNORED_FILTERS: ReadonlyArray<keyof BoardFilters> = [];
@@ -27,7 +28,8 @@ export function useProjectTaskView({
 }) {
   const ignore =
     scope === "backlog" ? BACKLOG_IGNORED_FILTERS : NO_IGNORED_FILTERS;
-  const [search, setSearch] = useState("");
+  const searchKey = `kaneo:task-search:${projectId}:${scope}`;
+  const [search, setSearch] = useSessionState(searchKey, "");
   const descriptionSearch = useDescriptionMatches(projectId, project, search);
   const filters = useTaskFiltersWithLabelsSupport(
     project,

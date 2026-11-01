@@ -1,3 +1,4 @@
+import { RequirementNodeTimes } from "@/components/requirement/requirement-node-times";
 import { useTranslation } from "react-i18next";
 import { CardFieldList } from "@/components/custom-fields/card-field-list";
 import { useTaskCardFields } from "@/components/custom-fields/use-task-card-fields";
@@ -82,22 +83,28 @@ export function TaskRowBody({
 
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <span className="truncate text-foreground text-sm">{task.title}</span>
-        {displayProgress !== undefined && (
-          <span
-            className="flex shrink-0 items-center gap-1"
-            title={`${t("tasks:properties.progress")}: ${Math.round(displayProgress)}%`}
-          >
-            <span className="h-1 w-12 overflow-hidden rounded-full bg-muted">
-              <span
-                className="block h-full rounded-full bg-primary"
-                style={{ width: `${Math.min(100, Math.max(0, displayProgress))}%` }}
-              />
-            </span>
-            <span className="text-[10px] text-muted-foreground tabular-nums">
-              {Math.round(displayProgress)}%
-            </span>
-          </span>
+        {task.projectKind === "requirement" && (
+          <RequirementNodeTimes task={task} />
         )}
+        {task.projectKind !== "requirement" &&
+          displayProgress !== undefined && (
+            <span
+              className="flex shrink-0 items-center gap-1"
+              title={`${t("tasks:properties.progress")}: ${Math.round(displayProgress)}%`}
+            >
+              <span className="h-1 w-12 overflow-hidden rounded-full bg-muted">
+                <span
+                  className="block h-full rounded-full bg-primary"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, displayProgress))}%`,
+                  }}
+                />
+              </span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {Math.round(displayProgress)}%
+              </span>
+            </span>
+          )}
         <div className="flex shrink-0 items-center gap-0.5">
           <SubtasksChip
             task={task}

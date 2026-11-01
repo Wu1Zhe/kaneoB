@@ -1,3 +1,7 @@
+import {
+  hasRequirementDescription,
+  normalizeRequirementData,
+} from "../requirement-rules";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
@@ -59,6 +63,26 @@ async function updateTask(
     });
   }
 
+  const container = await db.query.projectTable.findFirst({
+    where: eq(projectTable.id, projectId),
+  });
+  if (
+    container?.kind === "requirement" &&
+    (!title.trim() ||
+      (description !== undefined && !hasRequirementDescription(description)))
+  )
+    throw new HTTPException(400, {
+      message: "Requirement name and description are required",
+    });
+  if (container?.kind === "requirement")
+    normalizeRequirementData({
+      ...(dueDate !== undefined
+        ? { prodPlannedAt: dueDate?.toISOString() ?? null }
+        : {}),
+      ...(startDate !== undefined
+        ? { designStartPlannedAt: startDate?.toISOString() ?? null }
+        : {}),
+    });
   await assertValidTaskStatus(status, projectId);
 
   const normalizedUserId = userId?.trim() || undefined;

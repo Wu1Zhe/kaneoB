@@ -38,6 +38,12 @@ export function TaskShortcuts({
   const { canUpdateTasks, canAssignTasks } = useWorkspacePermission();
   const active = { enabled: enabled && Boolean(task) };
   const editable = { enabled: active.enabled && canUpdateTasks() };
+  const hierarchical = {
+    enabled: editable.enabled && task?.projectKind !== "requirement",
+  };
+  const hierarchyNavigation = {
+    enabled: active.enabled && task?.projectKind !== "requirement",
+  };
   const assignable = { enabled: active.enabled && canAssignTasks() };
 
   const openTask = (id: string | undefined) => {
@@ -55,7 +61,11 @@ export function TaskShortcuts({
   useShortcut("setDueDate", () => clickTaskAction("dueDate"), editable);
   useShortcut("moveToProject", () => clickTaskAction("move"), editable);
   useShortcut("addLink", () => clickTaskAction("addLink"), editable);
-  useShortcut("createSubtask", () => clickTaskAction("addSubtask"), editable);
+  useShortcut(
+    "createSubtask",
+    () => clickTaskAction("addSubtask"),
+    hierarchical,
+  );
   useShortcut("toggleResources", () => clickTaskAction("resources"), active);
   useShortcut("renameTask", () => focusTaskAction("title"), editable);
   useShortcut(
@@ -120,7 +130,7 @@ export function TaskShortcuts({
   useShortcut(
     "setParent",
     () => openRelationPicker(taskId, "parent"),
-    editable,
+    hierarchical,
   );
 
   useShortcut(
@@ -133,7 +143,7 @@ export function TaskShortcuts({
             relation.targetTaskId === taskId,
         )?.sourceTaskId,
       ),
-    active,
+    hierarchyNavigation,
   );
   useShortcut(
     "openSubtask",
@@ -145,7 +155,7 @@ export function TaskShortcuts({
             relation.sourceTaskId === taskId,
         )?.targetTaskId,
       ),
-    active,
+    hierarchyNavigation,
   );
 
   useShortcut("copyTaskId", copyActions.copyId, active);

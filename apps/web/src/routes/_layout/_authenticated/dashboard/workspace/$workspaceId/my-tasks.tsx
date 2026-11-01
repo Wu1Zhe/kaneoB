@@ -8,6 +8,8 @@ import {
   MyTasksGroupByToggle,
 } from "@/components/my-tasks/my-tasks-group-by";
 import { MyTasksList } from "@/components/my-tasks/my-tasks-list";
+import { PersonalInsightsBar } from "@/components/my-tasks/personal-insights-bar";
+import { InsightsViewProvider } from "@/components/project/insights/insights-view-provider";
 import PageTitle from "@/components/page-title";
 import {
   Empty,
@@ -28,11 +30,12 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { t } = useTranslation();
   const { workspaceId } = Route.useParams();
+  const [kind, setKind] = useState<"project" | "requirement" | undefined>();
   const {
     data: assigned,
     isLoading,
     isError,
-  } = useGetAssignedTasks(workspaceId);
+  } = useGetAssignedTasks(workspaceId, false, kind);
   const [groupBy, setGroupBy] = useState<MyTasksGroupBy>("dueDate");
 
   return (
@@ -41,12 +44,33 @@ function RouteComponent() {
       <WorkspaceLayout
         title={t("workspace:myTasks.pageTitle")}
         headerActions={
-          assigned?.tasks.length ? (
+          <div className="flex items-center gap-2">
+            <select
+              aria-label={t("reporting:sourceFilter")}
+              value={kind ?? "all"}
+              onChange={(event) =>
+                setKind(
+                  event.target.value === "all"
+                    ? undefined
+                    : (event.target.value as "project" | "requirement"),
+                )
+              }
+              className="h-8 rounded border bg-background px-2 text-xs"
+            >
+              <option value="all">{t("reporting:sourceAll")}</option>
+              <option value="project">{t("reporting:sourceProject")}</option>
+              <option value="requirement">
+                {t("reporting:sourceRequirement")}
+              </option>
+            </select>
             <MyTasksGroupByToggle value={groupBy} onChange={setGroupBy} />
-          ) : null
+          </div>
         }
       >
         <div className="h-full overflow-y-auto">
+          <InsightsViewProvider key={workspaceId}>
+            <PersonalInsightsBar workspaceId={workspaceId} kind={kind} />
+          </InsightsViewProvider>
           {isLoading ? (
             <div className="flex flex-col px-4">
               {[1, 2, 3, 4].map((row) => (

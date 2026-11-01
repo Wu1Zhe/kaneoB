@@ -8,6 +8,12 @@ const NEXT_MONTH = new Date(
 ).toISOString();
 
 describe("getDueDateStatus", () => {
+  it("flags a deadline that passed less than a day ago", () => {
+    const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
+    expect(getDueDateStatus(oneMinuteAgo)).toBe("overdue");
+    expect(getDueDateStatus(oneMinuteAgo, true)).toBe("far-future");
+  });
+
   it("flags overdue and due-soon dates for open tasks", () => {
     expect(getDueDateStatus(YESTERDAY)).toBe("overdue");
     expect(getDueDateStatus(TOMORROW)).toBe("due-soon");

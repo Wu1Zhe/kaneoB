@@ -1,9 +1,10 @@
+import { RequirementProperties } from "@/components/requirement/requirement-properties";
 import { Calendar, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import icons from "@/constants/project-icons";
 import { getColumnIcon } from "@/lib/column";
 import { cn } from "@/lib/cn";
-import { formatDateShort } from "@/lib/format";
+import { formatDateShort, formatDateTimeShort } from "@/lib/format";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
 import { TaskCustomFieldRows } from "../custom-fields/task-custom-field-rows";
@@ -44,6 +45,8 @@ export function PropertiesRail({
     useTaskProperties(taskId, projectId, workspaceId);
 
   if (!task) return null;
+  const isRequirement =
+    task.projectKind === "requirement" || project?.kind === "requirement";
 
   const ProjectIcon =
     icons[project?.icon as keyof typeof icons] || icons.Layout;
@@ -84,65 +87,93 @@ export function PropertiesRail({
           </TaskAssigneePopover>
         </PropertyRow>
 
-        <PropertyRow label={t("tasks:properties.plannedStart")}>
-          <TaskStartDatePopover
-            task={task}
-            label={t("tasks:properties.plannedStart")}
-          >
-            <PropertyValue className="flex-none">
-              <CalendarDays className="text-muted-foreground" />
-              <span
-                className={cn(
-                  "truncate",
-                  !task.startDate && "text-muted-foreground",
-                )}
+        {isRequirement ? (
+          <>
+            {(
+              [
+                ["startDate", "plannedStart"],
+                ["dueDate", "plannedEnd"],
+                ["actualStartAt", "actualStart"],
+                ["actualEndAt", "actualEnd"],
+              ] as const
+            ).map(([field, label]) => (
+              <PropertyRow key={field} label={t(`tasks:properties.${label}`)}>
+                <span
+                  title={t("tasks:requirement.mappingHint")}
+                  className="px-2 text-xs text-muted-foreground"
+                >
+                  {task[field] ? formatDateTimeShort(task[field]!) : "—"}
+                </span>
+              </PropertyRow>
+            ))}
+          </>
+        ) : (
+          <>
+            {" "}
+            <PropertyRow label={t("tasks:properties.plannedStart")}>
+              <TaskStartDatePopover
+                task={task}
+                label={t("tasks:properties.plannedStart")}
               >
-                {task.startDate
-                  ? formatDateShort(task.startDate)
-                  : t("tasks:properties.plannedStart")}
-              </span>
-            </PropertyValue>
-          </TaskStartDatePopover>
-        </PropertyRow>
-
-        <PropertyRow label={t("tasks:properties.plannedEnd")}>
-          <TaskDueDatePopover
-            task={task}
-            label={t("tasks:properties.plannedEnd")}
-          >
-            <PropertyValue
-              data-task-action="dueDate"
-              className={cn("flex-none", dueDateTextClass[dueStatus])}
-            >
-              <Calendar
-                className={cn(!task.dueDate && "text-muted-foreground")}
-              />
-              <span
-                className={cn(
-                  "truncate",
-                  !task.dueDate && "text-muted-foreground",
-                )}
+                <PropertyValue className="flex-none">
+                  <CalendarDays className="text-muted-foreground" />
+                  <span
+                    className={cn(
+                      "truncate",
+                      !task.startDate && "text-muted-foreground",
+                    )}
+                  >
+                    {task.startDate
+                      ? formatDateShort(task.startDate)
+                      : t("tasks:properties.plannedStart")}
+                  </span>
+                </PropertyValue>
+              </TaskStartDatePopover>
+            </PropertyRow>
+            <PropertyRow label={t("tasks:properties.plannedEnd")}>
+              <TaskDueDatePopover
+                task={task}
+                label={t("tasks:properties.plannedEnd")}
               >
-                {task.dueDate
-                  ? formatDateShort(task.dueDate)
-                  : t("tasks:properties.plannedEnd")}
-              </span>
-              <TaskRecurrenceBadge task={task} asText />
-            </PropertyValue>
-          </TaskDueDatePopover>
-        </PropertyRow>
+                <PropertyValue
+                  data-task-action="dueDate"
+                  className={cn("flex-none", dueDateTextClass[dueStatus])}
+                >
+                  <Calendar
+                    className={cn(!task.dueDate && "text-muted-foreground")}
+                  />
+                  <span
+                    className={cn(
+                      "truncate",
+                      !task.dueDate && "text-muted-foreground",
+                    )}
+                  >
+                    {task.dueDate
+                      ? formatDateTimeShort(task.dueDate)
+                      : t("tasks:properties.plannedEnd")}
+                  </span>
+                  <TaskRecurrenceBadge task={task} asText />
+                </PropertyValue>
+              </TaskDueDatePopover>
+            </PropertyRow>
+            <TaskActualDateRow task={task} field="actualStartAt" />
+            <TaskActualDateRow task={task} field="actualEndAt" />
+          </>
+        )}
 
-        <TaskActualDateRow task={task} field="actualStartAt" />
-        <TaskActualDateRow task={task} field="actualEndAt" />
-
-        <PropertyRow label={t("tasks:status.label")}>
-          <TaskStatusPopover task={task}>
-            <PropertyValue data-task-action="status" shortcutId="changeStatus">
-              {getColumnIcon(task.status ?? "", status.isFinal, status.icon)}
-              <span className="truncate">{status.label}</span>
-            </PropertyValue>
-          </TaskStatusPopover>
-        </PropertyRow>
+        {!isRequirement && (
+          <PropertyRow label={t("tasks:status.label")}>
+            <TaskStatusPopover task={task}>
+              <PropertyValue
+                data-task-action="status"
+                shortcutId="changeStatus"
+              >
+                {getColumnIcon(task.status ?? "", status.isFinal, status.icon)}
+                <span className="truncate">{status.label}</span>
+              </PropertyValue>
+            </TaskStatusPopover>
+          </PropertyRow>
+        )}
 
         <PropertyRow label={t("tasks:priority.label")}>
           <TaskPriorityPopover task={task}>
@@ -170,9 +201,11 @@ export function PropertiesRail({
           </TaskLabelsPopover>
         </PropertyRow>
 
-        <TaskProgressRow task={task} projectId={projectId} />
+        {!isRequirement && (
+          <TaskProgressRow task={task} projectId={projectId} />
+        )}
 
-        <TaskWeightRow task={task} />
+        {!isRequirement && <TaskWeightRow task={task} />}
 
         <PropertyRow label={t("tasks:properties.project")}>
           {canMoveTask ? (
@@ -189,6 +222,7 @@ export function PropertiesRail({
         </PropertyRow>
       </div>
 
+      {isRequirement && <RequirementProperties task={task} />}
       <TaskCustomFieldRows taskId={taskId} projectId={projectId} />
     </aside>
   );

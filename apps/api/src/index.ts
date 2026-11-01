@@ -1,3 +1,6 @@
+import ideas from "./ideas";
+import reporting from "./reporting";
+import { requestActor } from "./utils/request-actor";
 import { startWebhookWorker } from "./admin/webhooks/start-webhook-worker";
 import integrationSync from "./integration-sync";
 import { syncWorkspaceAccess } from "./ws/workspace-access";
@@ -797,7 +800,9 @@ export function createApp() {
         const windowId = c.req.header("X-Kaneo-Window-Id");
         const userId = c.get("userId");
         const initiatorId = windowId ? `${userId}:${windowId}` : userId;
-        return await eventContext.run({ initiatorId }, next);
+        return await requestActor.run(userId, () =>
+          eventContext.run({ initiatorId }, next),
+        );
       } catch (error) {
         if (!(error instanceof HTTPException)) {
           console.error("API authentication failed:", error);
@@ -813,6 +818,8 @@ export function createApp() {
   const oauthApi = api.route("/oauth", oauth);
 
   const billingApi = api.route("/billing", billing);
+  const ideasApi = api.route("/ideas", ideas);
+  const reportingApi = api.route("/reporting", reporting);
   const projectApi = api.route("/project", project);
   const calendarFeedApi = api.route("/calendar-feed", calendarFeed);
   const taskApi = api.route("/task", task);
@@ -999,6 +1006,8 @@ export function createApp() {
     labelApi,
     notificationApi,
     notificationPreferencesApi,
+    ideasApi,
+    reportingApi,
     projectApi,
     calendarFeedApi,
     publicProjectApi,
@@ -1058,7 +1067,9 @@ export async function runStartupTasks() {
 
 const configuredPort = Number(process.env.KANEO_API_PORT);
 const defaultPort =
-  Number.isInteger(configuredPort) && configuredPort > 0 ? configuredPort : 1337;
+  Number.isInteger(configuredPort) && configuredPort > 0
+    ? configuredPort
+    : 1337;
 
 export async function startServer(
   injectWebSocket: ReturnType<typeof createNodeWebSocket>["injectWebSocket"],
@@ -1139,6 +1150,8 @@ const {
   mattermostIntegrationApi,
   notificationApi,
   notificationPreferencesApi,
+  ideasApi,
+  reportingApi,
   projectApi,
   calendarFeedApi,
   publicProjectApi,
@@ -1168,6 +1181,8 @@ if (isMainModule) {
 }
 
 export type AppType =
+  | typeof ideasApi
+  | typeof reportingApi
   | typeof billingApi
   | typeof configApi
   | typeof projectApi

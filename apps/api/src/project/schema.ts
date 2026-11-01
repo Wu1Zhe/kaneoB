@@ -12,6 +12,7 @@ export const listProjectsQuery = z.object({
 });
 
 export const createProjectBody = z.object({
+  kind: z.enum(["project", "requirement"]).optional(),
   name: z.string(),
   workspaceId: z.string(),
   icon: z.string(),

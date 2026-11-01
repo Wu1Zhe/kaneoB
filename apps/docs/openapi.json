@@ -194,6 +194,25 @@
           "id": {
             "type": "string"
           },
+          "projectKind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "requirement"
+            ]
+          },
+          "requirementData": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
           "title": {
             "type": "string"
           },
@@ -299,6 +318,18 @@
             ]
           },
           "assigneeImage": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updatedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updaterName": {
             "type": [
               "string",
               "null"
@@ -878,6 +909,613 @@
           "idToken"
         ]
       },
+      "DashboardReport": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "project",
+                  "requirement"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug",
+              "kind"
+            ]
+          },
+          "since": {
+            "type": "string"
+          },
+          "until": {
+            "type": "string"
+          },
+          "asOf": {
+            "type": "string"
+          },
+          "coverageStart": {
+            "type": "string"
+          },
+          "historyComplete": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "number"
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "staleDays": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "staleDays"
+            ]
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "projectId": {
+                  "type": "string"
+                },
+                "number": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "statusName": {
+                  "type": "string"
+                },
+                "isFinal": {
+                  "type": "boolean"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "progress": {
+                  "type": "number"
+                },
+                "weight": {
+                  "type": "number"
+                },
+                "userId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "assigneeName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "creatorName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updaterName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "startDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "dueDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "actualStartAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "actualEndAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "requirementData": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "enteredAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "risk": {
+                  "type": "string"
+                },
+                "riskDays": {
+                  "type": "number"
+                },
+                "overdueStages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "stalledDays": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "projectId",
+                "number",
+                "title",
+                "description",
+                "status",
+                "statusName",
+                "isFinal",
+                "priority",
+                "progress",
+                "weight",
+                "userId",
+                "assigneeName",
+                "creatorName",
+                "updaterName",
+                "createdAt",
+                "updatedAt",
+                "startDate",
+                "dueDate",
+                "actualStartAt",
+                "actualEndAt",
+                "requirementData",
+                "enteredAt",
+                "risk",
+                "riskDays",
+                "overdueStages",
+                "stalledDays"
+              ]
+            }
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "launched": {
+                "type": "number"
+              },
+              "overdue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "total",
+              "launched",
+              "overdue"
+            ]
+          },
+          "startCounts": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "launched": {
+                "type": "number"
+              },
+              "overdue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "total",
+              "launched",
+              "overdue"
+            ]
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "isFinal": {
+                  "type": "boolean"
+                },
+                "count": {
+                  "type": "number"
+                },
+                "inflow": {
+                  "type": "number"
+                },
+                "outflow": {
+                  "type": "number"
+                },
+                "averageDays": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "stalled": {
+                  "type": "number"
+                },
+                "startCount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "slug",
+                "name",
+                "isFinal",
+                "count",
+                "inflow",
+                "outflow",
+                "averageDays",
+                "stalled",
+                "startCount"
+              ]
+            }
+          },
+          "weekly": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string"
+                },
+                "end": {
+                  "type": "string"
+                },
+                "available": {
+                  "type": "boolean"
+                },
+                "partial": {
+                  "type": "boolean"
+                },
+                "created": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "pirun": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "prod": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "launched": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "unlaunched": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "overdue": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "createdTasks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "projectId": {
+                        "type": "string"
+                      },
+                      "number": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "statusName": {
+                        "type": "string"
+                      },
+                      "isFinal": {
+                        "type": "boolean"
+                      },
+                      "priority": {
+                        "type": "string"
+                      },
+                      "progress": {
+                        "type": "number"
+                      },
+                      "weight": {
+                        "type": "number"
+                      },
+                      "userId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "assigneeName": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "creatorName": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "updaterName": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      },
+                      "startDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "dueDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "actualStartAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "actualEndAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "requirementData": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "enteredAt": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "risk": {
+                        "type": "string"
+                      },
+                      "riskDays": {
+                        "type": "number"
+                      },
+                      "overdueStages": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "stalledDays": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "projectId",
+                      "number",
+                      "title",
+                      "description",
+                      "status",
+                      "statusName",
+                      "isFinal",
+                      "priority",
+                      "progress",
+                      "weight",
+                      "userId",
+                      "assigneeName",
+                      "creatorName",
+                      "updaterName",
+                      "createdAt",
+                      "updatedAt",
+                      "startDate",
+                      "dueDate",
+                      "actualStartAt",
+                      "actualEndAt",
+                      "requirementData",
+                      "enteredAt",
+                      "risk",
+                      "riskDays",
+                      "overdueStages",
+                      "stalledDays"
+                    ]
+                  }
+                },
+                "composition": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "available",
+                "partial",
+                "created",
+                "pirun",
+                "prod",
+                "launched",
+                "unlaunched",
+                "overdue",
+                "createdTasks",
+                "composition"
+              ]
+            }
+          },
+          "categories": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "project",
+          "since",
+          "until",
+          "asOf",
+          "coverageStart",
+          "historyComplete",
+          "version",
+          "settings",
+          "tasks",
+          "counts",
+          "startCounts",
+          "states",
+          "weekly",
+          "categories",
+          "nodes"
+        ]
+      },
       "MovedProject": {
         "allOf": [
           {
@@ -899,6 +1537,14 @@
       "Project": {
         "type": "object",
         "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "requirement"
+            ],
+            "description": "Project category. Older clients and cached data default to project."
+          },
           "id": {
             "type": "string"
           },
@@ -1132,6 +1778,152 @@
           "nextCursor"
         ]
       },
+      "PersonalInsightTasks": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "projectKind": {
+                  "type": "string",
+                  "enum": [
+                    "project",
+                    "requirement"
+                  ]
+                },
+                "requirementData": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "projectId": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "number": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "statusName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "isFinal": {
+                  "type": "boolean"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "dueDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "startDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "actualEndAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "progress": {
+                  "type": "number"
+                },
+                "userId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "assigneeName": {
+                  "type": "string"
+                },
+                "assigneeImage": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "projectName": {
+                  "type": "string"
+                },
+                "projectSlug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "projectId",
+                "title",
+                "number",
+                "status",
+                "statusName",
+                "isFinal",
+                "priority",
+                "dueDate",
+                "startDate",
+                "createdAt",
+                "updatedAt",
+                "actualEndAt",
+                "progress",
+                "userId",
+                "assigneeName",
+                "assigneeImage",
+                "projectName",
+                "projectSlug"
+              ]
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "tasks",
+          "nextCursor"
+        ]
+      },
       "AssignedTasks": {
         "type": "object",
         "properties": {
@@ -1159,6 +1951,13 @@
           },
           "projectId": {
             "type": "string"
+          },
+          "projectKind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "requirement"
+            ]
           },
           "number": {
             "type": [
@@ -1309,6 +2108,25 @@
           "id": {
             "type": "string"
           },
+          "projectKind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "requirement"
+            ]
+          },
+          "requirementData": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
           "projectId": {
             "type": "string"
           },
@@ -1364,6 +2182,18 @@
             "type": "number",
             "description": "Weight used when a parent task aggregates its subtasks' progress. Defaults to 1."
           },
+          "updatedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updaterName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "createdBy": {
             "type": [
               "string",
@@ -1412,6 +2242,10 @@
             ]
           },
           "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
             "type": "string",
             "format": "date-time"
           },
@@ -1789,6 +2623,40 @@
           "updatedAt"
         ]
       },
+      "ProjectChanges": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceActivity"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
       "WorkspaceActivity": {
         "type": "object",
         "properties": {
@@ -1797,7 +2665,7 @@
           },
           "type": {
             "type": "string",
-            "description": "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed."
+            "description": "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed, requirement_plan_changed, requirement_actual_changed, requirement_details_changed."
           },
           "createdAt": {
             "type": "string",
@@ -1890,7 +2758,7 @@
           },
           "type": {
             "type": "string",
-            "description": "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed."
+            "description": "One of: comment, task, create, status_changed, priority_changed, assignee_changed, unassigned, due_date_changed, title_changed, progress_changed, description_changed, requirement_plan_changed, requirement_actual_changed, requirement_details_changed."
           },
           "createdAt": {
             "type": "string",
@@ -10428,6 +11296,1472 @@
         }
       }
     },
+    "/ideas/{projectId}": {
+      "get": {
+        "tags": [
+          "Ideas"
+        ],
+        "operationId": "listProjectIdeas",
+        "summary": "List project ideas with search, status and tag filters",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "inbox",
+                "evaluating",
+                "adopted",
+                "parked"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "required": false,
+            "name": "tag",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ideas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "projectId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "inbox",
+                              "evaluating",
+                              "adopted",
+                              "parked"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          },
+                          "createdBy": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "updatedBy": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "creatorName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "updatedByName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "number"
+                          },
+                          "convertedTaskId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "convertedAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "excerpt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "projectId",
+                          "title",
+                          "status",
+                          "tags",
+                          "pinned",
+                          "createdBy",
+                          "updatedBy",
+                          "creatorName",
+                          "updatedByName",
+                          "createdAt",
+                          "updatedAt",
+                          "version",
+                          "convertedTaskId",
+                          "convertedAt",
+                          "excerpt"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pages": {
+                      "type": "number"
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "number"
+                        },
+                        "inbox": {
+                          "type": "number"
+                        },
+                        "evaluating": {
+                          "type": "number"
+                        },
+                        "adopted": {
+                          "type": "number"
+                        },
+                        "parked": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "all",
+                        "inbox",
+                        "evaluating",
+                        "adopted",
+                        "parked"
+                      ]
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pages",
+                    "counts",
+                    "tags"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Idea or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idea changed or task already removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ideas"
+        ],
+        "operationId": "createProjectIdea",
+        "summary": "Capture a project idea without creating a task",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 100000,
+                    "default": ""
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "inbox",
+                      "evaluating",
+                      "adopted",
+                      "parked"
+                    ],
+                    "default": "inbox"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 32
+                    },
+                    "maxItems": 12,
+                    "default": []
+                  },
+                  "pinned": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "title"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "inbox",
+                        "evaluating",
+                        "adopted",
+                        "parked"
+                      ]
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "pinned": {
+                      "type": "boolean"
+                    },
+                    "createdBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "creatorName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedByName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "convertedTaskId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "convertedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "title",
+                    "description",
+                    "status",
+                    "tags",
+                    "pinned",
+                    "createdBy",
+                    "updatedBy",
+                    "creatorName",
+                    "updatedByName",
+                    "createdAt",
+                    "updatedAt",
+                    "version",
+                    "convertedTaskId",
+                    "convertedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Idea or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idea changed or task already removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/ideas/{projectId}/{ideaId}": {
+      "get": {
+        "tags": [
+          "Ideas"
+        ],
+        "operationId": "getProjectIdea",
+        "summary": "Get a project idea",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "ideaId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "inbox",
+                        "evaluating",
+                        "adopted",
+                        "parked"
+                      ]
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "pinned": {
+                      "type": "boolean"
+                    },
+                    "createdBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "creatorName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedByName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "convertedTaskId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "convertedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "title",
+                    "description",
+                    "status",
+                    "tags",
+                    "pinned",
+                    "createdBy",
+                    "updatedBy",
+                    "creatorName",
+                    "updatedByName",
+                    "createdAt",
+                    "updatedAt",
+                    "version",
+                    "convertedTaskId",
+                    "convertedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Idea or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idea changed or task already removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Ideas"
+        ],
+        "operationId": "updateProjectIdea",
+        "summary": "Edit idea content, tags, pin and state with optimistic concurrency",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "ideaId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 100000,
+                    "default": ""
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "inbox",
+                      "evaluating",
+                      "adopted",
+                      "parked"
+                    ],
+                    "default": "inbox"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 32
+                    },
+                    "maxItems": 12,
+                    "default": []
+                  },
+                  "pinned": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "title",
+                  "version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "inbox",
+                        "evaluating",
+                        "adopted",
+                        "parked"
+                      ]
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "pinned": {
+                      "type": "boolean"
+                    },
+                    "createdBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "creatorName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updatedByName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "convertedTaskId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "convertedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "projectId",
+                    "title",
+                    "description",
+                    "status",
+                    "tags",
+                    "pinned",
+                    "createdBy",
+                    "updatedBy",
+                    "creatorName",
+                    "updatedByName",
+                    "createdAt",
+                    "updatedAt",
+                    "version",
+                    "convertedTaskId",
+                    "convertedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Idea or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idea changed or task already removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/ideas/{projectId}/{ideaId}/convert": {
+      "post": {
+        "tags": [
+          "Ideas"
+        ],
+        "operationId": "convertProjectIdea",
+        "summary": "Adopt an idea and create exactly one task",
+        "description": "Atomic and idempotent conversion retains the source idea, copies its attachments and validates required project custom fields. An already converted idea returns its existing task.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "ideaId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "customFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "fieldId": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "fieldId",
+                        "value"
+                      ]
+                    },
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "version"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Linked task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "taskId": {
+                      "type": "string"
+                    },
+                    "existing": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "taskId",
+                    "existing"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid idea",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Idea or project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idea changed or task already removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/reporting/{id}": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "operationId": "getDashboardReport",
+        "summary": "Get a project-scoped report",
+        "description": "Reports use immutable task revisions and Asia/Shanghai calendar weeks. Missing historical periods are marked unavailable. Only the caller's accessible project is included.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            "required": false,
+            "name": "staleDays",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "until",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reporting interval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No project read access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          },
+          "503": {
+            "description": "Reporting query timed out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reporting/{id}/snapshots": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "operationId": "getDashboardSnapshots",
+        "summary": "List saved reporting snapshots",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "before",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "beforeId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest snapshots, at most 50 per page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "createdBy": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "data": {
+                        "$ref": "#/components/schemas/DashboardReport"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "createdAt",
+                      "createdBy",
+                      "data"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reporting interval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No project read access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          },
+          "503": {
+            "description": "Reporting query timed out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "operationId": "saveDashboardSnapshot",
+        "summary": "Save an immutable reporting snapshot",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "staleDays": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365,
+                    "default": 3
+                  },
+                  "since": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "since",
+                  "until",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "createdBy": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DashboardReport"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "createdAt",
+                    "createdBy",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reporting interval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No project read access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          },
+          "503": {
+            "description": "Reporting query timed out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/project/{id}/move": {
       "put": {
         "operationId": "moveProject",
@@ -10643,6 +12977,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "project",
+                      "requirement"
+                    ]
+                  },
                   "name": {
                     "type": "string"
                   },
@@ -12064,6 +14405,114 @@
         }
       }
     },
+    "/task/assigned/insights": {
+      "get": {
+        "operationId": "getPersonalInsightTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Page all tasks assigned to me for personal statistics",
+        "description": "Includes completed and archived tasks in readable active projects and requirements. The assignee is always the authenticated caller. Follow nextCursor to read the complete set, ordered by task ID.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project",
+                "requirement"
+              ]
+            },
+            "required": false,
+            "name": "kind",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "required": false,
+            "name": "after",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personal insight task page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalInsightTasks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/task/assigned": {
       "get": {
         "operationId": "listAssignedTasks",
@@ -12073,6 +14522,18 @@
         "summary": "List my assigned tasks",
         "description": "Get the open tasks assigned to the caller across a workspace's active projects. Completed and archived tasks are excluded. Ordered by due date (undated last), then priority. At most 100 tasks are returned; total counts all of them. Set countOnly=true to return just that total without loading task rows or labels.",
         "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project",
+                "requirement"
+              ]
+            },
+            "required": false,
+            "name": "kind",
+            "in": "query"
+          },
           {
             "schema": {
               "type": "string",
@@ -12884,6 +15345,15 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requirementData": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
                   "title": {
                     "type": "string"
                   },
@@ -14204,6 +16674,131 @@
         }
       }
     },
+    "/task/requirement/{id}": {
+      "put": {
+        "operationId": "updateRequirementField",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update one requirement field",
+        "description": "Only available in requirement containers. Planned times use half-hour intervals; actual times allow any minute. Clearing a field records its previous value in activity history.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "enum": [
+                      "reference",
+                      "type",
+                      "category",
+                      "department",
+                      "contact",
+                      "benefit",
+                      "notes",
+                      "planProvidedAt",
+                      "designStartPlannedAt",
+                      "designStartActualAt",
+                      "designPlannedAt",
+                      "designActualAt",
+                      "devPlannedAt",
+                      "devActualAt",
+                      "crossTestPlannedAt",
+                      "crossTestActualAt",
+                      "uatPlannedAt",
+                      "uatActualAt",
+                      "pirunPlannedAt",
+                      "pirunActualAt",
+                      "prodPlannedAt",
+                      "prodActualAt"
+                    ]
+                  },
+                  "value": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 10000
+                  }
+                },
+                "required": [
+                  "field",
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated requirement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid requirement field",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing task update permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/task/tracking/{id}": {
       "put": {
         "operationId": "updateTaskTracking",
@@ -15317,6 +17912,140 @@
         }
       }
     },
+    "/activity/project/{id}/changes": {
+      "get": {
+        "operationId": "getProjectChanges",
+        "tags": [
+          "Activity"
+        ],
+        "summary": "Get project or requirement task changes for a day",
+        "description": "Return status, due date, assignee and priority changes within the requested local-day UTC boundaries, newest first. Projects also include progress; requirements include node planned and actual completion times instead. Use nextCursor to load more.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project",
+                "requirement"
+              ]
+            },
+            "required": false,
+            "name": "kind",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "until",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "before",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "required": false,
+            "name": "beforeId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task changes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectChanges"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid window or cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/activity/workspace/{workspaceId}": {
       "get": {
         "operationId": "getWorkspaceActivities",
@@ -15362,6 +18091,141 @@
           },
           "403": {
             "description": "Missing project:read or task:read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/activity/workspace/{workspaceId}/my-changes": {
+      "get": {
+        "operationId": "getPersonalTaskChanges",
+        "tags": [
+          "Activity"
+        ],
+        "summary": "Get today's changes to tasks assigned to me",
+        "description": "Five change categories for tasks currently assigned to the authenticated caller in readable active projects and requirements, within the requested local-day UTC boundaries.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project",
+                "requirement"
+              ]
+            },
+            "required": false,
+            "name": "kind",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "name": "until",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "before",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "required": false,
+            "name": "beforeId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personal task changes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectChanges"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid window or cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing read permission",
             "content": {
               "application/json": {
                 "schema": {

@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
@@ -6,7 +7,6 @@ import { HierarchyView } from "@/components/hierarchy-view";
 import PageTitle from "@/components/page-title";
 import { DisplaySection } from "@/components/project/display/display-section";
 import { ActiveFiltersBar } from "@/components/project/task-filters/active-filters-bar";
-import { ProjectInsightsBar } from "@/components/project/insights";
 import { ProjectToolbar } from "@/components/project/toolbar/project-toolbar";
 import { TaskCount } from "@/components/project/toolbar/task-count";
 import { useProjectTaskView } from "@/components/project/toolbar/use-project-task-view";
@@ -31,6 +31,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
@@ -62,11 +63,6 @@ function RouteComponent() {
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="hierarchy"
-      insights={
-        project ? (
-          <ProjectInsightsBar project={filteredProject ?? project} />
-        ) : null
-      }
       toolbar={
         <ProjectToolbar
           view={view}
@@ -133,7 +129,11 @@ function RouteComponent() {
                 {t("tasks:hierarchy.noTasks")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {t("tasks:hierarchy.noTasksSubtitle")}
+                {t(
+                  isRequirement
+                    ? "tasks:requirement.emptyHierarchy"
+                    : "tasks:hierarchy.noTasksSubtitle",
+                )}
               </p>
             </div>
           </div>

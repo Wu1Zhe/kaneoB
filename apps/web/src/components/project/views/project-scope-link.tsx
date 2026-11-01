@@ -33,10 +33,10 @@ export function ProjectScopeLink({
         onSelect(view);
       }}
       className={cn(
-        "inline-flex h-6 items-center rounded-[calc(var(--radius-lg)-3px)] px-2.5 text-[13px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+        "inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 text-[13px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
         active
-          ? "bg-accent text-foreground shadow-xs/5"
-          : "text-muted-foreground hover:text-foreground",
+          ? "border-primary/20 bg-background text-primary font-semibold shadow-sm"
+          : "border-transparent text-muted-foreground hover:bg-background/70 hover:text-foreground",
       )}
     >
       {children}

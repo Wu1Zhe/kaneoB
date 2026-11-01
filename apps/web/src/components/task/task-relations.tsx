@@ -110,10 +110,14 @@ export default function TaskRelations({
   useEffect(() => {
     if (!relationRequest || relationRequest.taskId !== taskId) return;
     clearRelationRequest();
-    if (!canEdit) return;
+    if (
+      !canEdit ||
+      (project?.kind === "requirement" && relationRequest.mode === "parent")
+    )
+      return;
     setSelectedRelationType(relationRequest.mode);
     setCommandOpen(true);
-  }, [relationRequest, taskId, canEdit, clearRelationRequest]);
+  }, [relationRequest, taskId, canEdit, clearRelationRequest, project?.kind]);
 
   useEffect(() => {
     if (!commandOpen) {

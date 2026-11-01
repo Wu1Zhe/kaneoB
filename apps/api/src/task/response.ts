@@ -1,11 +1,45 @@
 import { nullableResponseTimestamp, responseTimestamp, z } from "../openapi";
+import { requirementDataSchema } from "./requirement-fields";
 import { taskRecurrenceSchema } from "./recurrence/schema";
 
 const priorityDescription = "One of: no-priority, low, medium, high, urgent.";
 
+export const personalInsightTasksSchema = z
+  .object({
+    tasks: z.array(
+      z.object({
+        id: z.string(),
+        projectKind: z.enum(["project", "requirement"]).optional(),
+        requirementData: requirementDataSchema.nullable().optional(),
+        projectId: z.string(),
+        title: z.string(),
+        number: z.number().nullable(),
+        status: z.string(),
+        statusName: z.string().nullable(),
+        isFinal: z.boolean(),
+        priority: z.string(),
+        dueDate: nullableResponseTimestamp,
+        startDate: nullableResponseTimestamp,
+        createdAt: responseTimestamp,
+        updatedAt: responseTimestamp,
+        actualEndAt: nullableResponseTimestamp,
+        progress: z.number(),
+        userId: z.string().nullable(),
+        assigneeName: z.string(),
+        assigneeImage: z.string().nullable(),
+        projectName: z.string(),
+        projectSlug: z.string(),
+      }),
+    ),
+    nextCursor: z.string().nullable(),
+  })
+  .openapi("PersonalInsightTasks");
+
 export const taskSchema = z
   .object({
     id: z.string(),
+    projectKind: z.enum(["project", "requirement"]).optional(),
+    requirementData: requirementDataSchema.nullable().optional(),
     projectId: z.string(),
     position: z.number().nullable().openapi({
       description: "Order within its column, ascending.",
@@ -34,6 +68,8 @@ export const taskSchema = z
       description:
         "Weight used when a parent task aggregates its subtasks' progress. Defaults to 1.",
     }),
+    updatedBy: z.string().nullable().optional(),
+    updaterName: z.string().nullable().optional(),
     createdBy: z.string().nullable().openapi({
       description: "The user who created the task.",
     }),
@@ -47,6 +83,7 @@ export const taskSchema = z
     }),
     recurrence: z.union([taskRecurrenceSchema, z.null()]).optional(),
     createdAt: responseTimestamp,
+    updatedAt: responseTimestamp.optional(),
     customFields: z
       .array(z.object({ fieldId: z.string(), value: z.string() }))
       .optional(),
@@ -115,6 +152,8 @@ const taskExternalLinkSchema = z
 export const boardTaskSchema = z
   .object({
     id: z.string(),
+    projectKind: z.enum(["project", "requirement"]).optional(),
+    requirementData: requirementDataSchema.nullable().optional(),
     title: z.string(),
     number: z.number().nullable(),
     description: z.string().nullable(),
@@ -138,6 +177,8 @@ export const boardTaskSchema = z
     assigneeName: z.string().nullable(),
     assigneeId: z.string().nullable(),
     assigneeImage: z.string().nullable(),
+    updatedBy: z.string().nullable().optional(),
+    updaterName: z.string().nullable().optional(),
     createdBy: z.string().nullable().openapi({
       description: "The user who created the task.",
     }),
@@ -321,6 +362,7 @@ export const assignedTasksSchema = z
         .object({
           id: z.string(),
           projectId: z.string(),
+          projectKind: z.enum(["project", "requirement"]).optional(),
           number: z.number().nullable(),
           title: z.string(),
           status: z.string().openapi({

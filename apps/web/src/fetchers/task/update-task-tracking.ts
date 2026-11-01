@@ -8,10 +8,7 @@ export type TaskTrackingUpdate = {
   actualEndAt?: string | null;
 };
 
-async function updateTaskTracking(
-  taskId: string,
-  update: TaskTrackingUpdate,
-) {
+async function updateTaskTracking(taskId: string, update: TaskTrackingUpdate) {
   const response = await client.task.tracking[":id"].$put({
     param: { id: taskId },
     json: update,

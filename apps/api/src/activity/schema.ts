@@ -10,6 +10,28 @@ export const taskIdParam = z.object({ taskId: z.string() });
 
 export const workspaceIdParam = z.object({ workspaceId: z.string().min(1) });
 
+export const projectChangesQuery = z
+  .object({
+    kind: z.enum(["project", "requirement"]).optional(),
+    since: z.iso.datetime(),
+    until: z.iso.datetime(),
+    before: z.iso.datetime().optional(),
+    beforeId: z.string().min(1).max(128).optional(),
+    limit: pagingNumber(1, 100).default(50),
+  })
+  .refine(
+    (query) => {
+      const duration = Date.parse(query.until) - Date.parse(query.since);
+      return duration > 0 && duration <= 26 * 60 * 60 * 1000;
+    },
+    {
+      message: "The requested window must be at most one local day (26 hours).",
+    },
+  )
+  .refine((query) => Boolean(query.before) === Boolean(query.beforeId), {
+    message: "Both cursor fields must be supplied together.",
+  });
+
 export const createActivityBody = z.object({
   taskId: z.string(),
   message: z.string().nullable().openapi({

@@ -2,3 +2,9 @@
 # trailing carriage return to commitlint and every commit fails on Unix.
 .husky/* text eol=lf
 apps/docs/openapi.json text eol=lf
+
+# Container startup scripts must keep Unix line endings on Windows.
+deploy/kaneo-entrypoint.sh text eol=lf
+apps/web/runtime-storage.sh text eol=lf
+apps/web/env.sh text eol=lf
+apps/web/env.awk text eol=lf

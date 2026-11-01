@@ -1,3 +1,5 @@
+import { RequirementDateField } from "@/components/requirement/requirement-date-field";
+import { Link, useSearch } from "@tanstack/react-router";
 import { BellRing, CalendarClock, ClockAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,7 +19,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import { useNudgeTask } from "@/hooks/mutations/notification/use-nudge-task";
 import { cn } from "@/lib/cn";
 import { toast } from "@/lib/toast";
-import type { ProjectWithTasks } from "@/types/project";
+import type { InsightProject } from "./insights-data";
 import { formatInsightDuration } from "./format-insight-duration";
 import {
   collectInsightTasks,
@@ -26,6 +28,7 @@ import {
   type OverdueBand,
   type OverdueEntry,
 } from "./insights-data";
+import { useInsightsView } from "./use-insights-view";
 
 const REFRESH_MS = 60_000;
 
@@ -41,12 +44,15 @@ function useMinutelyNow() {
 function OverdueRow({
   entry,
   band,
+  workspaceId,
 }: {
   entry: OverdueEntry;
   band: OverdueBand;
+  workspaceId?: string;
 }) {
   const { t } = useTranslation();
   const nudge = useNudgeTask();
+  const search = useSearch({ strict: false });
   const { task, distanceMs } = entry;
   const label =
     band === "overdue"
@@ -80,9 +86,27 @@ function OverdueRow({
 
   return (
     <div className="group flex items-center gap-2 border-border/40 border-b px-3 py-1.5 last:border-0 hover:bg-accent/40">
-      <span className="min-w-0 flex-1 truncate text-sm" title={task.title}>
+      <Link
+        {...(workspaceId
+          ? {
+              to: "/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId" as const,
+              params: {
+                workspaceId,
+                projectId: task.projectId,
+                taskId: task.id,
+              },
+            }
+          : { to: "." as const, search: { ...search, taskId: task.id } })}
+        className="min-w-0 flex-1 truncate rounded-sm text-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        title={task.title}
+      >
         {task.title}
-      </span>
+        {entry.stage && (
+          <span className="ml-1 text-xs text-warning-foreground">
+            · {t("tasks:requirement.stageAlert", { stage: entry.stage.label })}
+          </span>
+        )}
+      </Link>
       <div className="flex w-20 shrink-0 items-center gap-1.5">
         <AssigneeAvatar
           name={task.assigneeName}
@@ -117,17 +141,27 @@ function OverdueRow({
         >
           <BellRing />
         </Button>
-        <TaskDueDatePopover task={task}>
-          <Button
-            type="button"
-            size="icon-xs"
-            variant="ghost"
-            aria-label={t("tasks:insights.changeDueDate")}
-            title={t("tasks:insights.changeDueDate")}
-          >
-            <CalendarClock />
-          </Button>
-        </TaskDueDatePopover>
+        {entry.stage ? (
+          <div className="w-24">
+            <RequirementDateField
+              task={task}
+              field={entry.stage.planned}
+              label={`${entry.stage.label} ${t("tasks:requirement.planned")}`}
+            />
+          </div>
+        ) : (
+          <TaskDueDatePopover task={task}>
+            <Button
+              type="button"
+              size="icon-xs"
+              variant="ghost"
+              aria-label={t("tasks:insights.changeDueDate")}
+              title={t("tasks:insights.changeDueDate")}
+            >
+              <CalendarClock />
+            </Button>
+          </TaskDueDatePopover>
+        )}
       </div>
     </div>
   );
@@ -159,17 +193,22 @@ function EmptyBand({ band }: { band: OverdueBand }) {
 function BandList({
   entries,
   band,
+  workspaceId,
 }: {
   entries: OverdueEntry[];
   band: OverdueBand;
+  workspaceId?: string;
 }) {
   const { t } = useTranslation();
   if (entries.length === 0) return <EmptyBand band={band} />;
   return (
     <div role="list">
       {entries.slice(0, 50).map((entry) => (
-        <div role="listitem" key={`${band}-${entry.task.id}`}>
-          <OverdueRow entry={entry} band={band} />
+        <div
+          role="listitem"
+          key={`${band}-${entry.task.id}-${entry.stage?.id ?? "overall"}`}
+        >
+          <OverdueRow entry={entry} band={band} workspaceId={workspaceId} />
         </div>
       ))}
       {entries.length > 50 && (
@@ -181,10 +220,18 @@ function BandList({
   );
 }
 
-export function OverdueTasksPanel({ project }: { project: ProjectWithTasks }) {
+export function OverdueTasksPanel({
+  project,
+  workspaceId,
+  title,
+}: {
+  project: InsightProject;
+  workspaceId?: string;
+  title?: string;
+}) {
   const { t } = useTranslation();
   const now = useMinutelyNow();
-  const [band, setBand] = useState<OverdueBand>("overdue");
+  const [band, setBand] = useInsightsView("band");
   const columns = useMemo(() => getInsightColumns(project), [project]);
   const tasks = useMemo(() => collectInsightTasks(project), [project]);
   const overdueEntries = useMemo(
@@ -201,7 +248,7 @@ export function OverdueTasksPanel({ project }: { project: ProjectWithTasks }) {
       <div className="flex shrink-0 items-center gap-2 px-4 pt-3">
         <ClockAlert className="size-4 text-warning-foreground" />
         <h2 className="font-medium text-sm">
-          {t("tasks:insights.overdueTitle")}
+          {title ?? t("tasks:insights.overdueTitle")}
         </h2>
         <Badge
           size="sm"
@@ -237,10 +284,18 @@ export function OverdueTasksPanel({ project }: { project: ProjectWithTasks }) {
           value="overdue"
           className="min-h-0 flex-1 overflow-y-auto pb-1"
         >
-          <BandList entries={overdueEntries} band="overdue" />
+          <BandList
+            entries={overdueEntries}
+            band="overdue"
+            workspaceId={workspaceId}
+          />
         </TabsPanel>
         <TabsPanel value="soon" className="min-h-0 flex-1 overflow-y-auto pb-1">
-          <BandList entries={soonEntries} band="soon" />
+          <BandList
+            entries={soonEntries}
+            band="soon"
+            workspaceId={workspaceId}
+          />
         </TabsPanel>
       </Tabs>
     </Card>

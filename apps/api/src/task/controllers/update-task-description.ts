@@ -1,7 +1,8 @@
+import { hasRequirementDescription } from "../requirement-rules";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { withLockedTask } from "./with-locked-task";
-import { taskTable } from "../../database/schema";
+import { taskTable, projectTable } from "../../database/schema";
 import { publishTaskMutation } from "./task-mutation-effects";
 
 async function updateTaskDescription({
@@ -15,7 +16,17 @@ async function updateTaskDescription({
 }) {
   const { before: existingTask, after: updatedTask } = await withLockedTask(
     id,
-    async (tx) => {
+    async (tx, before) => {
+      const container = await tx.query.projectTable.findFirst({
+        where: eq(projectTable.id, before.projectId),
+      });
+      if (
+        container?.kind === "requirement" &&
+        !hasRequirementDescription(description)
+      )
+        throw new HTTPException(400, {
+          message: "Requirement description is required",
+        });
       const [updatedTask] = await tx
         .update(taskTable)
         .set({ description })

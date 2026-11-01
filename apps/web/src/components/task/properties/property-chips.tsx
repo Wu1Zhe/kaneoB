@@ -1,10 +1,12 @@
+import { RequirementDateSummary } from "@/components/requirement/requirement-date-summary";
+import { RequirementProperties } from "@/components/requirement/requirement-properties";
 import { ArrowRight, Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { propertyChipClass } from "@/components/custom-fields/property-chip-class";
 import icons from "@/constants/project-icons";
 import { cn } from "@/lib/cn";
 import { getColumnIcon } from "@/lib/column";
-import { formatDateShort } from "@/lib/format";
+import { formatDateShort, formatDateTimeShort } from "@/lib/format";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
 import { TaskCustomFieldChips } from "../custom-fields/task-custom-field-chips";
@@ -46,6 +48,8 @@ export function PropertyChips({
     useTaskProperties(taskId, projectId, workspaceId);
 
   if (!task) return null;
+  const isRequirement =
+    task.projectKind === "requirement" || project?.kind === "requirement";
 
   const ProjectIcon =
     icons[project?.icon as keyof typeof icons] || icons.Layout;
@@ -59,12 +63,14 @@ export function PropertyChips({
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <div className="flex flex-wrap items-center gap-1.5">
-        <TaskStatusPopover task={task}>
-          <button type="button" data-task-action="status" className={chip}>
-            {getColumnIcon(task.status ?? "", status.isFinal, status.icon)}
-            <span className="truncate">{status.label}</span>
-          </button>
-        </TaskStatusPopover>
+        {!isRequirement && (
+          <TaskStatusPopover task={task}>
+            <button type="button" data-task-action="status" className={chip}>
+              {getColumnIcon(task.status ?? "", status.isFinal, status.icon)}
+              <span className="truncate">{status.label}</span>
+            </button>
+          </TaskStatusPopover>
+        )}
         <TaskPriorityPopover task={task}>
           <button type="button" data-task-action="priority" className={chip}>
             {getPriorityIcon(task.priority ?? "")}
@@ -96,48 +102,55 @@ export function PropertyChips({
             </span>
           </button>
         </TaskAssigneePopover>
-        <div className={cn(chip, "gap-0.5 px-1 hover:bg-accent/30")}>
-          <TaskStartDatePopover
-            task={task}
-            label={t("tasks:properties.plannedStart")}
-          >
-            <button type="button" className={dateButton}>
-              <Calendar
-                className={cn(
-                  task.dueDate
-                    ? dueDateTextClass[dueStatus]
-                    : "text-muted-foreground",
-                )}
-              />
-              <span className="text-muted-foreground">
-                {task.startDate
-                  ? formatDateShort(task.startDate)
-                  : t("tasks:properties.plannedStart")}
-              </span>
-            </button>
-          </TaskStartDatePopover>
-          <ArrowRight className="text-muted-foreground/60" />
-          <TaskDueDatePopover
-            task={task}
-            label={t("tasks:properties.plannedEnd")}
-          >
-            <button
-              type="button"
-              data-task-action="dueDate"
-              className={cn(
-                dateButton,
-                task.dueDate
-                  ? dueDateTextClass[dueStatus]
-                  : "text-muted-foreground",
-              )}
-            >
-              {task.dueDate
-                ? formatDateShort(task.dueDate)
-                : t("tasks:properties.plannedEnd")}
-              <TaskRecurrenceBadge task={task} asText />
-            </button>
-          </TaskDueDatePopover>
-        </div>
+        {isRequirement ? (
+          <RequirementDateSummary task={task} />
+        ) : (
+          <>
+            {" "}
+            <div className={cn(chip, "gap-0.5 px-1 hover:bg-accent/30")}>
+              <TaskStartDatePopover
+                task={task}
+                label={t("tasks:properties.plannedStart")}
+              >
+                <button type="button" className={dateButton}>
+                  <Calendar
+                    className={cn(
+                      task.dueDate
+                        ? dueDateTextClass[dueStatus]
+                        : "text-muted-foreground",
+                    )}
+                  />
+                  <span className="text-muted-foreground">
+                    {task.startDate
+                      ? formatDateShort(task.startDate)
+                      : t("tasks:properties.plannedStart")}
+                  </span>
+                </button>
+              </TaskStartDatePopover>
+              <ArrowRight className="text-muted-foreground/60" />
+              <TaskDueDatePopover
+                task={task}
+                label={t("tasks:properties.plannedEnd")}
+              >
+                <button
+                  type="button"
+                  data-task-action="dueDate"
+                  className={cn(
+                    dateButton,
+                    task.dueDate
+                      ? dueDateTextClass[dueStatus]
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {task.dueDate
+                    ? formatDateTimeShort(task.dueDate)
+                    : t("tasks:properties.plannedEnd")}
+                  <TaskRecurrenceBadge task={task} asText />
+                </button>
+              </TaskDueDatePopover>
+            </div>
+          </>
+        )}
         <TaskLabelsPopover task={task} workspaceId={workspaceId}>
           <button
             type="button"
@@ -166,6 +179,7 @@ export function PropertyChips({
           className="h-8"
         />
       </div>
+      {isRequirement && <RequirementProperties task={task} />}
     </div>
   );
 }

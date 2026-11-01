@@ -3,6 +3,8 @@ import { produce } from "immer";
 import { SquareKanbanIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useIsRequirement } from "@/components/project/project-kind-context";
+import { RequirementList } from "@/components/requirement/requirement-list";
 import BacklogListView from "@/components/backlog-list-view";
 import { BacklogToolbarActions } from "@/components/backlog-list-view/backlog-toolbar-actions";
 import ProjectLayout from "@/components/common/project-layout";
@@ -38,6 +40,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
   const { projectId, workspaceId } = Route.useParams();
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
@@ -99,22 +102,25 @@ function RouteComponent() {
     if (!project) return;
 
     const plannedTasks = project.plannedTasks || [];
+    const targetStatus = isRequirement ? "backlog" : "to-do";
 
     for (const task of plannedTasks) {
       updateTask({
         ...task,
-        status: "to-do",
+        status: targetStatus,
       });
     }
 
     const updatedProject = produce(project, (draft) => {
       // "to-do" is a column slug, so it can only be matched against slug.
-      const todoColumn = draft.columns?.find((col) => col.slug === "to-do");
+      const todoColumn = draft.columns?.find(
+        (col) => col.slug === targetStatus,
+      );
       if (todoColumn && draft.plannedTasks) {
         todoColumn.tasks.push(
           ...draft.plannedTasks.map((task) => ({
             ...task,
-            status: "to-do",
+            status: targetStatus,
           })),
         );
 
@@ -177,10 +183,41 @@ function RouteComponent() {
       <div className="relative flex flex-col h-full min-h-0 overflow-hidden">
         <div className="flex-1 overflow-hidden bg-card h-full">
           {sortedProject ? (
-            <BacklogListView
-              project={sortedProject}
-              disableDragDrop={sort.field !== "position"}
-            />
+            isRequirement ? (
+              <RequirementList
+                project={{
+                  ...sortedProject,
+                  columns: [
+                    ...sortedProject.columns.map((column) => ({
+                      ...column,
+                      tasks: [],
+                    })),
+                    {
+                      id: "planned",
+                      slug: "planned",
+                      icon: null,
+                      name: t("tasks:backlog.sections.planned"),
+                      isFinal: false,
+                      tasks: sortedProject.plannedTasks,
+                    },
+                    {
+                      id: "archived",
+                      slug: "archived",
+                      icon: null,
+                      name: t("tasks:backlog.sections.archived"),
+                      isFinal: true,
+                      tasks: sortedProject.archivedTasks,
+                    },
+                  ],
+                }}
+                scope="backlog"
+              />
+            ) : (
+              <BacklogListView
+                project={sortedProject}
+                disableDragDrop={sort.field !== "position"}
+              />
+            )
           ) : (
             <div className="flex h-full items-center justify-center">
               <div className="text-center space-y-4">

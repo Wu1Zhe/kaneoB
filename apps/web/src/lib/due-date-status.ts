@@ -29,9 +29,7 @@ export function getDueDateStatus(
 
   const now = new Date();
   const due = new Date(dueDate);
-  const diffInDays = Math.ceil(
-    (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const diffInDays = (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
 
   if (diffInDays < 0) return "overdue";
   if (diffInDays <= 3) return "due-soon";

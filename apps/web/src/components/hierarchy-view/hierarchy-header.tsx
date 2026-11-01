@@ -1,3 +1,4 @@
+import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import {
@@ -9,6 +10,7 @@ import {
 /** Column headings shared by every row; sticky while the hierarchy scrolls. */
 export function HierarchyHeader() {
   const { t } = useTranslation();
+  const isRequirement = useIsRequirement();
 
   return (
     <div
@@ -20,12 +22,21 @@ export function HierarchyHeader() {
       <span className="flex min-w-0 flex-1 items-center pl-9">
         {t("tasks:hierarchy.columns.task")}
       </span>
-      {HIERARCHY_COLUMNS.map((column) => (
+      {HIERARCHY_COLUMNS.filter(
+        (column) => !isRequirement || column.id !== "subtasks",
+      ).map((column) => (
         <span
           key={column.id}
-          className={cn(HIERARCHY_CELL_CLASS, column.widthClass)}
+          className={cn(
+            HIERARCHY_CELL_CLASS,
+            isRequirement && column.id === "progress"
+              ? "w-[11rem]"
+              : column.widthClass,
+          )}
         >
-          {t(`tasks:hierarchy.columns.${column.id}`)}
+          {isRequirement && column.id === "progress"
+            ? t("tasks:requirement.nodeTimes")
+            : t(`tasks:hierarchy.columns.${column.id}`)}
         </span>
       ))}
     </div>

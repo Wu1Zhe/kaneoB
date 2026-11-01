@@ -246,6 +246,10 @@ describe("CreateTaskModal", () => {
       .closest("button")!;
     fireEvent.click(trigger);
     fireEvent.click(await screen.findByText("tasks:due.today"));
+    fireEvent.click(
+      screen.getByRole("button", { name: "tasks:datePicker.apply" }),
+    );
+    expect(trigger).not.toHaveTextContent("common:modals.createTask.dueDate");
     fireEvent.click(trigger);
     fireEvent.click(await screen.findByText("Clear date"));
     expect(trigger).toHaveTextContent("common:modals.createTask.dueDate");

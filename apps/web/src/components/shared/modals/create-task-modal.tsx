@@ -70,7 +70,7 @@ import useGetProjectMembers from "@/hooks/queries/workspace-users/use-get-projec
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { cn } from "@/lib/cn";
 import { uploadDraftAsset } from "@/lib/upload-draft-asset";
-import { formatDateMedium } from "@/lib/format";
+import { formatDateMedium, formatDateTimeShort } from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { resolveLabelColor } from "@/lib/label-color";
 import { getPriorityIcon } from "@/lib/priority";
@@ -236,6 +236,8 @@ function CreateTaskModalContent({
   const canCreateTaskCapability = canCreateTasks();
   const canCreateLabelCapability = canCreateLabels();
 
+  const [requirementType, setRequirementType] = useState("");
+  const [requirementReference, setRequirementReference] = useState("");
   const [title, setTitle] = useState("");
   const titleRef = useAutoGrowTextarea(title);
   const [description, setDescription] = useState("");
@@ -269,6 +271,7 @@ function CreateTaskModalContent({
     (candidate) => candidate.id === (explicitProjectId || selectedProjectId),
   );
   const resolvedProjectId = resolvedProject?.id ?? "";
+  const isRequirement = resolvedProject?.kind === "requirement";
   const { data: projectMembers } = useGetProjectMembers({
     workspaceId: workspace?.id || "",
     projectId: resolvedProjectId,
@@ -546,6 +549,18 @@ function CreateTaskModalContent({
       return;
     }
 
+    if (
+      isRequirement &&
+      (!requirementType.trim() ||
+        (!description
+          .replace(/<[^>]*>/g, "")
+          .replace(/&nbsp;/gi, " ")
+          .trim() &&
+          !/<img\b/i.test(description)))
+    ) {
+      toast.error(t("tasks:requirement.requiredCreate"));
+      return;
+    }
     submittingRef.current = true;
     setIsSubmitting(true);
     try {
@@ -561,6 +576,14 @@ function CreateTaskModalContent({
       const savedTask = normalizeTask(
         await createTask({
           title: title.trim(),
+          ...(isRequirement
+            ? {
+                requirementData: {
+                  type: requirementType.trim(),
+                  reference: requirementReference.trim() || null,
+                },
+              }
+            : {}),
           description: description.trim() || "",
           userId: selectedUser?.id ?? "",
           priority,
@@ -609,6 +632,8 @@ function CreateTaskModalContent({
 
       if (createMore) {
         setTitle("");
+        setRequirementType("");
+        setRequirementReference("");
         setDescription("");
         setPriority("no-priority");
         setAssigneeId("");
@@ -804,6 +829,37 @@ function CreateTaskModalContent({
           className="flex flex-col flex-1 min-h-0 space-y-6"
         >
           <div className="flex-1 min-h-0 overflow-y-auto space-y-6 px-6">
+            {isRequirement && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-xs text-muted-foreground">
+                  {t("tasks:requirement.fields.reference")} *
+                  <input
+                    aria-label={t("tasks:requirement.fields.reference")}
+                    value={requirementReference}
+                    onChange={(event) =>
+                      setRequirementReference(event.target.value)
+                    }
+                    placeholder={t("tasks:requirement.autoReference")}
+                    className="mt-1 w-full rounded border bg-background p-2 text-sm"
+                  />
+                </label>
+                <label className="text-xs text-muted-foreground">
+                  {t("tasks:requirement.fields.type")} *
+                  <input
+                    required
+                    aria-label={t("tasks:requirement.fields.type")}
+                    value={requirementType}
+                    onChange={(event) => setRequirementType(event.target.value)}
+                    className="mt-1 w-full rounded border bg-background p-2 text-sm"
+                  />
+                </label>
+              </div>
+            )}
+            {isRequirement && (
+              <p className="text-xs text-muted-foreground">
+                {t("tasks:requirement.nameRequired")}
+              </p>
+            )}
             <textarea
               ref={titleRef}
               rows={1}
@@ -824,6 +880,11 @@ function CreateTaskModalContent({
             />
 
             <div className="min-h-[200px]">
+              {isRequirement && (
+                <p className="mb-2 text-xs text-muted-foreground">
+                  {t("tasks:requirement.descriptionRequired")}
+                </p>
+              )}
               <TaskDescriptionEditor
                 key={editorVersion}
                 value={description}
@@ -1089,7 +1150,7 @@ function CreateTaskModalContent({
                     <CalendarIcon className="w-3.5 h-3.5" />
                     <span>
                       {dueDate
-                        ? formatDateMedium(dueDate)
+                        ? formatDateTimeShort(dueDate)
                         : t("common:modals.createTask.dueDate")}
                     </span>
                     <TaskRecurrenceBadge task={{ recurrence }} asText />
