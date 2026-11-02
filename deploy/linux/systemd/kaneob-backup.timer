@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly KaneoB backup (Asia/Shanghai)
+
+[Timer]
+OnCalendar=*-*-* *:00:00 Asia/Shanghai
+RandomizedDelaySec=5m
+Persistent=true
+Unit=kaneob-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+{
+  "root": "/data/kaneob",
+  "data_mount": "/data",
+  "project": "kaneob-linux",
+  "age_recipient": "REPLACE_WITH_AGE_PUBLIC_RECIPIENT",
+  "retention_days": 30,
+  "timeout_seconds": 3600,
+  "remote": {
+    "host": "backup@backup.example.com",
+    "port": 22,
+    "directory": "/srv/backups/kaneob",
+    "ssh_key": "/root/.ssh/kaneob-backup",
+    "known_hosts": "/root/.ssh/known_hosts"
+  },
+  "object_backup_command": []
+}

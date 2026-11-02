@@ -8,3 +8,7 @@ deploy/kaneo-entrypoint.sh text eol=lf
 apps/web/runtime-storage.sh text eol=lf
 apps/web/env.sh text eol=lf
 apps/web/env.awk text eol=lf
+
+# Linux operations are copied to servers from Windows checkouts too.
+deploy/linux/** text eol=lf
+tests/linux-ops/** text eol=lf

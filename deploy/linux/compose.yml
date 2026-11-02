@@ -1,0 +1,84 @@
+name: kaneob-linux
+
+x-logging: &logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - type: bind
+        source: ${KANEO_ROOT:?}/postgres
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: false
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+  kaneo:
+    image: ${KANEO_IMAGE:?Use a built image tag or registry digest}
+    pull_policy: never
+    env_file:
+      - ${KANEO_ROOT:?}/.env
+    volumes:
+      - type: bind
+        source: ${KANEO_ROOT:?}/runtime
+        target: /var/lib/kaneo
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${KANEO_ROOT:?}/api-data
+        target: /app/apps/api/data
+        bind:
+          create_host_path: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "wget", "-Y", "off", "--quiet", "--spider", "http://127.0.0.1:5173/api/health"]
+      interval: 5s
+      timeout: 5s
+      start_period: 120s
+      retries: 24
+
+  gateway:
+    image: ${GATEWAY_IMAGE:-nginx:stable-alpine}
+    ports:
+      - "${KANEO_BIND:-127.0.0.1}:${KANEO_PORT:-5173}:80"
+    volumes:
+      - type: bind
+        source: ${KANEO_ROOT:?}/state/gateway
+        target: /maintenance
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${KANEO_ROOT:?}/config/gateway.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      kaneo:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 5s
+      timeout: 5s
+      retries: 12

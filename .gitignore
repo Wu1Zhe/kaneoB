@@ -68,3 +68,7 @@ apps/web/.tanstack/
 .dev-local.pid
 main.tar.gz
 backups/
+
+# Python operations tooling
+__pycache__/
+*.pyc

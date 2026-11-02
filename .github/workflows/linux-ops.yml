@@ -1,0 +1,31 @@
+name: Linux backup and upgrade operations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "deploy/linux/**"
+      - "tests/linux-ops/**"
+      - ".github/workflows/linux-ops.yml"
+  pull_request:
+    paths:
+      - "deploy/linux/**"
+      - "tests/linux-ops/**"
+      - ".github/workflows/linux-ops.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup-restore-and-failure-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build isolated Linux test tools
+        run: docker build -f tests/linux-ops/Dockerfile -t kaneob-ops-tests .
+      - name: Verify real PG16 restore, SSH sync and upgrade failure gates
+        run: docker run --rm --mount type=bind,source="$PWD",target=/workspace,readonly kaneob-ops-tests

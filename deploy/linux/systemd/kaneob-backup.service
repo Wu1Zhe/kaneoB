@@ -1,0 +1,15 @@
+[Unit]
+Description=KaneoB verified encrypted off-site backup
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+Environment=KANEO_OPS_CONFIG=/etc/kaneob/ops.json
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /opt/kaneob-ops/main.py backup
+TimeoutStartSec=2h
+NoNewPrivileges=true

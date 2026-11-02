@@ -238,6 +238,190 @@ Get-Item -LiteralPath $backupPath | Select-Object FullName, Length
 
 需要附件功能时，在私有部署 `.env` 中配置 `S3_ENDPOINT`、`S3_BUCKET`，以及成对的 `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` 等变量，参考根目录 [.env.sample](.env.sample)。上传端点需能被应用容器和浏览器访问。若要求附件也全部保存在 D 盘，需要另外部署本地 S3 兼容存储并把其数据目录绑定到 D 盘；当前两容器模板未包含该服务。
 
+## Linux：自动备份、异地同步和受保护升级
+
+[Linux 运维工具](deploy/linux)适用于 **同一台 Linux 主机上的 rootful Docker Engine + Compose、PostgreSQL 16 和本仓库打包镜像**。支持 Ubuntu 22.04/24.04 等提供 Python 3.10+、systemd、age、SSH/rsync 的系统，不使用远程 Docker context。现有 Windows Docker 实例仍沿用前面的配置。
+
+这套工具不依赖宿主 Docker socket 暴露给其他容器。备份验证只启动唯一命名、无网络、无宿主数据挂载的临时 PostgreSQL 容器，并在完成后删除该临时容器及其匿名卷。
+
+### 1. Linux 目录和保障范围
+
+```text
+/opt/kaneoB/                    # 源码，用于构建带提交号的镜像
+/opt/kaneob-ops/                # 独立安装的运维工具
+/etc/kaneob/ops.json            # 私有运维配置，0600
+/data/kaneob/                   # 本项目数据目录
+├── .env                       # 私有部署配置，0600
+├── compose.yml
+├── config/gateway.conf
+├── postgres/                  # 永久数据库目录
+├── runtime/                   # UID 1001 可写的运行目录
+├── api-data/                  # API 预留本地文件目录
+├── backups/                   # 加密数据归档、校验文件和同步状态
+│   └── images/                # 本地构建镜像按版本加密留档
+└── state/                     # 操作锁、版本记录、维护/恢复状态
+```
+
+Linux 模板有 `postgres`、`kaneo`、`gateway` 三个服务。应用和数据库不发布宿主端口，只有 gateway 默认监听 `127.0.0.1:5173`。gateway 在升级维护期间返回 HTTP 503；新版本健康检查和关键记录核对通过后才重新开放。外部 HTTPS 反向代理应只指向 gateway，不要绕过维护入口访问应用容器。
+
+`data_mount` 指向实际数据盘挂载点，如 `/data`；脚本会检查挂载并使用禁止自动创建源目录的绑定挂载。若有意使用系统根分区，可配置 `data_mount: "/"`，不要把尚未挂上的数据盘当成空目录初始化。初始化会为 UID `1001:0` 设置运行和本地文件目录权限，不使用 `chmod 777`。
+
+每份备份包括完整应用数据库、数据库一致性快照中的表记录数/关键表 ID 校验值、私有 `.env`、Compose、gateway 和运维 JSON 配置、本地 `api-data` 及可选对象存储导出。**在线备份的数据库导出与校验清单使用同一个导出快照**，并发写入不会导致两者时间点不同。临时数据库必须实际恢复成功且记录核对一致，归档才会发布；暂存前也会检查备份文件系统空间并保留至少 1 GiB 的安全余量。
+
+私有配置与数据使用 [age 公钥加密](https://github.com/FiloSottile/age)，备份主机不需要解密私钥。SSH 采用已知主机校验和密钥登录；rsync 传输完成后，还要在异地执行 SHA-256 校验和磁盘刷新，成功后才写同步完成标记。SSH 私钥不打入备份包。本地构建的应用镜像按镜像 ID/加密公钥缓存一份加密镜像归档并同步；注册表镜像记录不可变 digest，恢复时必须能从注册表取得该版本。
+
+### 2. 首次配置
+
+以下示例在 **root shell** 中执行，域名、数据盘与异地地址替换成自己的值。先按 [Docker 官方 Linux 安装说明](https://docs.docker.com/engine/install/ubuntu/)安装 Docker Engine 和 Compose 插件。
+
+```bash
+apt-get update
+apt-get install -y python3 age rsync openssh-client tzdata
+
+git clone https://github.com/Wu1Zhe/kaneoB.git /opt/kaneoB
+cd /opt/kaneoB
+version=$(git rev-parse --short=12 HEAD)
+docker build -f Dockerfile.kaneo -t "kaneob:$version" .
+
+install -d -m 755 /opt/kaneob-ops /etc/kaneob
+cp -R deploy/linux/. /opt/kaneob-ops/
+chown -R root:root /opt/kaneob-ops /etc/kaneob
+chmod -R go-w /opt/kaneob-ops /etc/kaneob
+install -m 600 deploy/linux/ops.json.example /etc/kaneob/ops.json
+```
+
+在**单独的安全恢复机器**上生成 age 密钥，保存私钥的离线副本，仅把 `age-keygen -y` 输出的公钥填进服务器运维配置：
+
+```bash
+umask 077
+age-keygen -o kaneob-recovery.agekey
+age-keygen -y kaneob-recovery.agekey
+```
+
+在备份服务器创建仅能写专用备份目录的普通 SSH 账号，并安装 `rsync`、`sha256sum`、`sync` 等工具。应用服务器创建专用 SSH 密钥，人工核对备份服务器的 SSH 主机指纹并完成公钥登录配置；脚本不会自动接受未知主机或关闭主机校验。
+
+编辑 `/etc/kaneob/ops.json`，填写 `root`、`data_mount`、`project`、真实 `age_recipient`、异地 SSH 主机/端口/目录、SSH 私钥和 `known_hosts` 路径。SSH 私钥须为 `0600`。运维 JSON 不执行 shell，远程目录使用不含空格的绝对路径。该格式针对 `.env` 中的稳定密码和认证密钥，不支持把应用数据库指向外部数据库或使用未纳入备份的 `*_FILE` 密钥。
+
+```bash
+# /data 已正确挂载；首次初始化要求目标数据目录为空
+python3 /opt/kaneob-ops/main.py init \
+  --image "kaneob:$version" --url https://projects.example.com
+
+docker compose -p kaneob-linux --env-file /data/kaneob/.env \
+  -f /data/kaneob/compose.yml pull postgres gateway
+docker compose -p kaneob-linux --env-file /data/kaneob/.env \
+  -f /data/kaneob/compose.yml up -d --wait --wait-timeout 300
+
+# 第一次手工备份成功后再启用定时任务
+python3 /opt/kaneob-ops/main.py backup
+```
+
+初始化只生成一次数据库密码和 `AUTH_SECRET`，不会覆盖已有部署。命令默认读取 `/etc/kaneob/ops.json`；自定义配置使用 `main.py --config /path/ops.json backup`，或设置 `KANEO_OPS_CONFIG`。
+
+### 3. 定时任务、同步重试与保留策略
+
+```bash
+install -m 644 /opt/kaneob-ops/systemd/kaneob-backup.service /etc/systemd/system/
+install -m 644 /opt/kaneob-ops/systemd/kaneob-backup.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now kaneob-backup.timer
+systemctl list-timers kaneob-backup.timer
+journalctl -u kaneob-backup.service -n 50
+```
+
+默认**每小时按北京时间触发，随机延迟最多 5 分钟**，关机错过时开机补执行一次。通过 systemd drop-in 修改时间，不覆盖仓库里的模板。备份、恢复、升级共用独占锁；重叠操作会失败退出，不会同时迁移或修改备份文件。[systemd 定时器说明](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html)
+
+同步失败时，本地完整的加密归档和校验文件会保留，不标记异地成功；可以重试同一份文件：
+
+```bash
+python3 /opt/kaneob-ops/main.py sync /data/kaneob/backups/kaneob-实际文件名.tar.age
+```
+
+本地默认保留 30 天，只清理已成功同步的过期数据归档，保留最近一份以及当前版本对应的升级前恢复点；未同步归档和镜像缓存不自动删除。异地采用追加式同步，不使用 `--delete`，本地过期清理不会传播为远端删除。异地保留期、只增写/不可变备份和镜像缓存清理需在备份端独立管理。systemd 的失败状态和 journal 可接入服务器监控；本工具不内置邮件/聊天通知。
+
+### 4. 升级：备份或异地校验失败就中止
+
+```bash
+cd /opt/kaneoB
+git status --short
+git pull --ff-only origin main
+version=$(git rev-parse --short=12 HEAD)
+docker build -f Dockerfile.kaneo -t "kaneob:$version" .
+python3 /opt/kaneob-ops/main.py upgrade "kaneob:$version"
+```
+
+先处理源码中的本地修改；运维工具安装在独立目录，其自身更新应单独审阅后安装。升级命令会将目标镜像解析为固定镜像 ID，流程如下：
+
+1. 校验数据挂载、数据库版本、服务状态和当前配置，准备新镜像。
+2. 关闭 gateway 入口、停止旧应用及其后台写入。
+3. 导出一致性数据库快照，在无网络临时 PostgreSQL 中完整恢复并核对记录；加密数据/配置和必要的本地镜像，异地同步并校验。
+4. **只有全部成功才写入新镜像配置并启动新应用迁移**；备份、恢复校验或异地同步失败时不启动新版本，尝试恢复旧镜像，旧版本健康后才重新开放入口。
+5. 新版本健康检查及用户、工作区、项目、任务、灵感、报表快照的记录数/ID 校验通过后记录版本并开放入口。
+
+如果新版本可能已经执行迁移但启动/验收失败，应用会被停止，维护状态与 `state/recovery-required.json` 保留，后续自动备份/升级不会把这个状态当作正常版本。**不会自动用旧程序连接已经迁移过的数据库。** 查看状态文件中记录的升级前备份，按下一节恢复到新目录。若失败标记的 `phase` 是 `pre-backup`，说明尚未调用新版本启动；确认仍为旧镜像、数据库和旧应用健康后才可人工清理维护标记及失败状态。不要跳过这些检查直接删除标记。
+
+### 5. 验证、灾难恢复与回退
+
+从异地取回数据归档及同名 `.sha256`，本地镜像还需取回 `images/` 下对应的镜像归档和校验文件。远端 `.complete` 表示该文件通过了上传后的校验。保留 age 私钥、备份文件、运行版本和足够的临时磁盘空间；解密临时目录可通过 `TMPDIR` 指向有足够空间的数据盘。只恢复自己信任的备份。
+
+```bash
+# 私钥仅用于恢复/演练机器，权限 0600；不要放进仓库或同步到备份目录
+chmod 600 /secure/kaneob-recovery.agekey
+export TMPDIR=/data/kaneob/backups
+python3 /opt/kaneob-ops/main.py verify \
+  /data/kaneob/backups/kaneob-实际文件名.tar.age \
+  --identity /secure/kaneob-recovery.agekey
+
+# 新目录 + 新 Compose 项目 + 不同端口，原数据库不会被覆盖
+python3 /opt/kaneob-ops/main.py restore \
+  /data/kaneob/backups/kaneob-实际文件名.tar.age \
+  --identity /secure/kaneob-recovery.agekey \
+  --target-root /data/kaneob-restored --project kaneob-restored --port 15173
+```
+
+恢复会检查归档及内部文件校验值、拒绝越界路径/链接，先在临时数据库验证，再创建新实例。数据库使用归档配置中的原密码；运行镜像必须与备份记录的镜像 ID 一致。本地镜像从加密 `images/` 留档加载，注册表镜像按 digest 拉取，因此恢复机器须能读取相关注册表且架构与原服务器一致。数据库恢复使用 `pg_restore --exit-on-error --single-transaction`，任何错误都会中止。[PostgreSQL 恢复说明](https://www.postgresql.org/docs/16/app-pgrestore.html)
+
+恢复失败时新目录保持维护状态，不清空旧数据；修正原因后使用另一个空目录重新恢复。**恢复成功也只启动数据库，不自动启动应用、邮件/webhook 等后台任务。** 仅做恢复演练时，停留在 `verify` 或 `restore` 即可。
+
+正式接管时先确认旧实例停止写入，检查恢复配置中的外部集成和存储。恢复工具生成了指向新目录/新项目的运维配置示例，审阅 SSH 路径、对象备份命令和异地位置后安装，再显式激活：
+
+```bash
+install -m 600 /data/kaneob-restored/config/ops.restore.example.json /etc/kaneob/restored.json
+# 先审阅 /etc/kaneob/restored.json 和新实例 .env，再正式启动
+python3 /opt/kaneob-ops/main.py --config /etc/kaneob/restored.json \
+  activate --url https://projects.example.com
+```
+
+激活会设置新的站点/API/CORS 地址，启动后台任务，在维护入口关闭期间核对原镜像、数据库和关键记录，通过后开放新端口。此时通过 SSH 隧道或临时反向代理验收新实例，再切换正式反向代理。手工执行新实例的备份成功后，再切换 systemd 使用的运维配置并启用定时备份；也可以安装为独立的 timer/service，避免两个实例共用错误配置。新服务器灾难恢复时，可先建立运维配置所指的 `root/state` 与 `root/backups` 目录用于操作锁和下载归档，不需要重新初始化原数据库。
+
+备份恢复点之后已经接收的新写入不会出现在旧备份中。因此升级验收期间保持维护入口关闭；计划外故障的数据回退窗口取决于最近成功异地备份，小时级备份不等于零数据损失。这套脚本使用逻辑备份，未实现 WAL 连续归档/PITR。需要更小恢复窗口时再部署持续日志归档方案。
+
+### 6. 启用附件后的备份和恢复
+
+默认两端没有 S3 附件服务。启用 `S3_ENDPOINT` 后，必须在 `ops.json` 配置 `object_backup_command`，否则备份/升级会中止。该配置是可执行文件参数数组，不经过 shell，例如在另行安装配置 rclone 后：
+
+```json
+"object_backup_command": ["/usr/bin/rclone", "copy", "kaneob-s3:bucket-name", "{destination}"]
+```
+
+命令需成功导出桶中所需对象到给定目录；对象存储的凭据由该工具独立保护。在线备份时数据库和对象存储不共享事务快照，应使用对象版本/保留策略或供应商的一致性快照。升级备份会停止本应用写入；若有其他写入方，也需同时暂停。
+
+包含外部对象的备份要求使用同样的 `restore` 参数并加 `--database-only`，只恢复和验证数据库，把对象导出到新实例的 `restored-objects/`；应用保持停止，恢复配置中的 S3 端点会被清空，避免误连原桶。将对象恢复到**新桶**，在新 `.env` 中配置新桶端点与凭据，并同步修改新运维配置中的对象备份命令。核对对象/记录后，用上一节的 `activate` 命令加 `--objects-restored` 正式接管。恢复前查看 `state/recovery-required.json` 并确认对应阶段，不要让两个实例同时写同一个存储。
+
+仅需要解密文件、查阅原配置或自行恢复外部对象时，可使用：
+
+```bash
+python3 /opt/kaneob-ops/main.py unpack /data/kaneob/backups/kaneob-实际文件名.tar.age \
+  --identity /secure/kaneob-recovery.agekey --destination /data/kaneob-recovery-private
+```
+
+该目录包含明文密钥和数据，应保持私有并在恢复完成后妥善清理。Linux 运维测试可在无宿主 socket 的容器内运行；使用合成数据的真实 PostgreSQL 16、age 和 SSH/rsync，Docker 传输边界由测试替身隔离：
+
+```bash
+docker build -f tests/linux-ops/Dockerfile -t kaneob-ops-tests .
+docker run --rm --mount type=bind,source="$PWD",target=/workspace,readonly kaneob-ops-tests
+```
+
 ## 上游项目说明
 
 以下保留 Kaneo 上游的功能、贡献方式和许可证信息。
