@@ -214,6 +214,8 @@
 			"instanceStatusError": "无法连接服务器，请稍后重试。",
 			"heading": "登录 Kaneo",
 			"submitPassword": "登录",
+			"usePassword": "改用邮箱和密码登录",
+			"useEmailCode": "改用邮箱验证码登录",
 			"invitation": {
 				"title": "{{inviterName}} 邀请你加入 {{workspaceName}}",
 				"fallbackTitle": "你收到了邀请",

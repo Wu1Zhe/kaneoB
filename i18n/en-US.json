@@ -214,6 +214,8 @@
 			"instanceStatusError": "Couldn't reach the server. Please retry in a moment.",
 			"heading": "Sign in to Kaneo",
 			"submitPassword": "Sign in",
+			"usePassword": "Use email and password instead",
+			"useEmailCode": "Email me a sign-in code instead",
 			"invitation": {
 				"title": "{{inviterName}} invited you to {{workspaceName}}",
 				"fallbackTitle": "You've been invited",

@@ -74,7 +74,17 @@ function SignIn() {
     (invitationId ? `/invitation/accept/${invitationId}` : "/dashboard");
   const baseUrl = import.meta.env.VITE_CLIENT_URL;
   const providers = getProviders(config);
-  const emailMethod = getEmailMethod(config);
+  const defaultEmailMethod = getEmailMethod(config);
+  const [overrideMethod, setOverrideMethod] = useState<"code" | "password" | null>(
+    null,
+  );
+  const emailMethod = overrideMethod ?? defaultEmailMethod;
+  // Email code is the default when SMTP is configured; let people switch
+  // between the code form and the email/password form on the same page.
+  const canSwitchEmailMethod =
+    Boolean(config?.hasSmtp) &&
+    !config?.disableEmailOtpSignIn &&
+    !config?.disableLoginForm;
   const getName = useProviderName(config?.customOAuthName);
   const { pending: providerPending, signIn: signInWithProvider } =
     useProviderSignIn({
@@ -201,6 +211,26 @@ function SignIn() {
             disabled={busy}
             onSuccess={() => navigate({ to: destination })}
           />
+        ) : null}
+        {canSwitchEmailMethod ? (
+          <p className="pt-4 text-muted-foreground text-sm">
+            <button
+              type="button"
+              className={authLinkClassName}
+              disabled={busy || captcha.pending}
+              onClick={() =>
+                setOverrideMethod(emailMethod === "code" ? "password" : "code")
+              }
+            >
+              {emailMethod === "code"
+                ? t("auth:signIn.usePassword", {
+                    defaultValue: "Use email and password instead",
+                  })
+                : t("auth:signIn.useEmailCode", {
+                    defaultValue: "Email me a sign-in code instead",
+                  })}
+            </button>
+          </p>
         ) : null}
         {emailMethod && providers.length > 0 ? <AuthDivider /> : null}
         {!emailMethod && captcha.siteKey ? (
