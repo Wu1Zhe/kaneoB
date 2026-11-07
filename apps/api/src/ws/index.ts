@@ -976,6 +976,13 @@ subscribeToEvent<{ projects: { projectId: string }[] }>(
   },
 );
 
+subscribeToEvent<{ userIds: string[] }>(
+  "task.collaboration_changed",
+  async ({ userIds }) => {
+    for (const id of userIds) broadcastToUser(id, { type: "MY_WORK_UPDATED" });
+  },
+);
+
 const taskUpdateEvents = [
   "task.created",
   "task.updated",

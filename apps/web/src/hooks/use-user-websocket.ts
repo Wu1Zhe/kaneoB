@@ -1,4 +1,5 @@
 import { workspaceStatusQueryKey } from "@/hooks/queries/workspace/use-workspace-archived";
+import { invalidateMyWork } from "@/lib/invalidate-my-work";
 import { windowId } from "@kaneo/libs";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -192,6 +193,7 @@ export function useUserWebSocket() {
               void queryClient.invalidateQueries({ queryKey });
             reconcileProjectAccess(queryClient, workspaceId, () => !disposed);
           }
+          if (message.type === "MY_WORK_UPDATED") invalidateMyWork(queryClient);
           if (message.type === "NOTIFICATION_CREATED") {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
           }

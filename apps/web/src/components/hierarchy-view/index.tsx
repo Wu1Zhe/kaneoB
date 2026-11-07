@@ -1,5 +1,9 @@
+import { TaskTableLayout } from "./task-table-layout";
+import { TreeControls } from "./tree-controls";
+import { useStoredState } from "@/hooks/use-stored-state";
+import { normalizeCollapsed, NONE_COLLAPSED } from "@/lib/collapsed-sections";
 import { RequirementList } from "@/components/requirement/requirement-list";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useIsRequirement } from "@/components/project/project-kind-context";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -65,9 +69,12 @@ export function HierarchyView({
   // Everything starts expanded: a hierarchy whose branches are all folded
   // looks exactly like a flat list. Only collapsed rows are stored, and a
   // collapsed parent hides its descendants without forgetting their state.
-  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(
-    () => new Set(),
+  const [collapsedIds, setCollapsedIds] = useStoredState(
+    `kaneo:hierarchy-collapsed:${project.id}`,
+    normalizeCollapsed,
+    NONE_COLLAPSED,
   );
+  const collapsed = useMemo(() => new Set(collapsedIds), [collapsedIds]);
 
   const rows = useMemo(
     () =>
@@ -80,20 +87,43 @@ export function HierarchyView({
     [roots, children, tasksById, collapsed],
   );
 
-  const toggleExpanded = useCallback((rowId: string) => {
-    setCollapsed((previous) => {
-      const next = new Set(previous);
-      if (next.has(rowId)) next.delete(rowId);
-      else next.add(rowId);
-      return next;
-    });
-  }, []);
+  const toggleExpanded = useCallback(
+    (rowId: string) => {
+      setCollapsedIds((previous) => {
+        const next = new Set(previous);
+        if (next.has(rowId)) next.delete(rowId);
+        else next.add(rowId);
+        return [...next];
+      });
+    },
+    [setCollapsedIds],
+  );
 
   if (isRequirement)
     return <RequirementList project={project} onOpenTask={onOpenTask} />;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <TaskTableLayout
+      projectId={project.id}
+      view="hierarchy"
+      className="flex h-full min-h-0 flex-col"
+    >
+      <TreeControls
+        disabled={relationsLoading || relationsFailed}
+        onExpand={() => setCollapsedIds([])}
+        onCollapse={() =>
+          setCollapsedIds(
+            flattenSubtaskRows({
+              tasks: roots,
+              children,
+              tasksById,
+              isExpanded: () => true,
+            })
+              .filter((row) => row.childCount > 0)
+              .map((row) => row.rowId),
+          )
+        }
+      />
       {!isRequirement && relationsFailed && (
         // Without relations every task renders as a root, which reads exactly
         // like a project with no subtasks; this says it isn't.
@@ -139,6 +169,6 @@ export function HierarchyView({
           })}
         </div>
       </div>
-    </div>
+    </TaskTableLayout>
   );
 }

@@ -1,3 +1,5 @@
+import { Portal } from "@/components/home/portal";
+import { UpdateNotice } from "@/components/releases/update-notice";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -54,6 +56,7 @@ function RouteComponent() {
       <PageTitle title={t("workspace:home.pageTitle")} />
       <WorkspaceLayout title={t("workspace:home.pageTitle")}>
         <div className="h-full overflow-y-auto">
+          <UpdateNotice />
           <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
           <div className="mx-auto flex w-full max-w-5xl flex-col gap-9 px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
             <header className="flex items-end justify-between gap-4">
@@ -84,6 +87,7 @@ function RouteComponent() {
               )}
             </header>
 
+            <Portal key={workspaceId} workspaceId={workspaceId} />
             <WeekStrip
               tasks={assigned?.tasks ?? []}
               workspaceId={workspaceId}

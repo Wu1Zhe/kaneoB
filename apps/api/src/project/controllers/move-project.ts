@@ -224,6 +224,13 @@ async function moveProject(
         ),
       );
 
+    await tx
+      .update(taskTable)
+      .set({
+        collaboratorIds: sql`(select coalesce(jsonb_agg(person.value), '[]'::jsonb) from jsonb_array_elements_text(${taskTable.collaboratorIds}) person(value) where exists(select 1 from ${workspaceUserTable} membership where membership.user_id=person.value and membership.workspace_id=${targetWorkspaceId}))`,
+      })
+      .where(eq(taskTable.projectId, id));
+
     // Assets and task labels denormalize the project's workspace.
     await tx
       .update(assetTable)

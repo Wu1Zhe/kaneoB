@@ -1,3 +1,4 @@
+import { taskInvolves } from "../collaboration";
 import {
   and,
   asc,
@@ -40,7 +41,7 @@ async function getAssignedTasks(
     kind ? eq(projectTable.kind, kind) : undefined,
     eq(projectTable.workspaceId, workspaceId),
     isNull(projectTable.archivedAt),
-    eq(taskTable.userId, userId),
+    taskInvolves(userId),
     ne(taskTable.status, "archived"),
     sql`not (${projectTable.kind} = 'requirement' and nullif(${taskTable.requirementData}->>'prodActualAt','') is not null)`,
     sql`not coalesce((
@@ -88,6 +89,9 @@ async function getAssignedTasks(
         id: taskTable.id,
         projectId: taskTable.projectId,
         projectKind: projectTable.kind,
+        involvement: sql<
+          "owner" | "collaborator"
+        >`case when ${taskTable.userId}=${userId} then 'owner' else 'collaborator' end`,
         number: taskTable.number,
         title: taskTable.title,
         status: taskTable.status,

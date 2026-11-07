@@ -316,6 +316,12 @@ function renderActivityContent({
     );
   }
 
+  if (activity.type === "collaborators_changed")
+    return (
+      <span className="text-muted-foreground">
+        {t("tasks:collaboration.changed")}
+      </span>
+    );
   if (activity.type === "assignee_changed") {
     if (eventData) {
       if (eventData.isSelfAssigned) {

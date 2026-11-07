@@ -36,6 +36,9 @@ import {
 } from "./relations";
 import { resolveDatabaseConfig } from "./resolve-database-url";
 import {
+  portalLinkTable,
+  releaseReadTable,
+  requirementAttachmentTable,
   ideaTable,
   taskRevisionTable,
   dashboardSnapshotTable,
@@ -95,6 +98,9 @@ import {
 config();
 
 export const schema = {
+  portalLinkTable,
+  releaseReadTable,
+  requirementAttachmentTable,
   ideaTable,
   taskRevisionTable,
   dashboardSnapshotTable,

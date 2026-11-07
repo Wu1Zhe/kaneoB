@@ -15,7 +15,9 @@ export const client = hc<AppType>(apiUrl, {
       ...init,
       headers: {
         ...init?.headers,
-        "Content-Type": "application/json",
+        ...(init?.body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
         "X-Kaneo-Window-Id": windowId,
       },
       credentials: "include",

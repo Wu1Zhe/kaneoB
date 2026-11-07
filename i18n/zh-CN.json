@@ -30,6 +30,7 @@
 		"appName": "Kaneo",
 		"actions": {
 			"cancel": "取消",
+			"save": "保存",
 			"close": "关闭",
 			"clearAll": "全部清除",
 			"delete": "删除",
@@ -3915,6 +3916,41 @@
 			"start": "开始",
 			"finish": "完成",
 			"legacyMissing": "待补全必填信息：类型。现有内容已保留，请补齐后继续维护。"
+		},
+		"collaboration": {
+			"label": "协作人",
+			"primary": "主负责人",
+			"add": "添加协作人",
+			"search": "搜索项目成员",
+			"hint": "协作任务会进入协作人的“我的任务”，主负责人负责最终交付。",
+			"myCollaboration": "我协作",
+			"myResponsibility": "我负责",
+			"count": "{{count}} 名协作人",
+			"changed": "修改了任务协作人"
+		},
+		"parent": {
+			"label": "父任务",
+			"none": "无父任务",
+			"search": "搜索任务编号或名称",
+			"hint": "只能选择本项目中的一个父任务，不能选择后代任务。",
+			"unavailable": "父任务不可用"
+		},
+		"excel": {
+			"title": "Excel 附件",
+			"upload": "上传 Excel",
+			"uploading": "上传中…",
+			"hint": "支持 .xlsx / .xls，单个不超过 10 MiB，最多 20 个。附件随数据库一起备份。",
+			"invalid": "请选择不超过 10 MiB 的非空 .xlsx 或 .xls 文件。",
+			"tooMany": "每个需求最多上传 20 个 Excel 附件。",
+			"failed": "附件加载或保存失败。",
+			"remove": "移除 {{name}}"
+		},
+		"table": {
+			"expandAll": "全部展开",
+			"collapseAll": "全部收起",
+			"resetWidths": "恢复默认列宽",
+			"resize": "调整列宽",
+			"resizeHint": "拖动或使用方向键调整列宽；双击恢复默认"
 		}
 	},
 	"invitations": {
@@ -4075,6 +4111,62 @@
 			"manage": "Manage workspaces",
 			"otherWorkspaces": "Go to workspaces",
 			"title": "Workspace archived"
+		},
+		"portal": {
+			"title": "Portal · 常用入口",
+			"subtitle": "快速进入业务系统和个人常用网站，在新标签页打开。",
+			"shared": "公共入口",
+			"personal": "我的入口",
+			"add": "新增入口",
+			"manage": "管理",
+			"done": "完成",
+			"edit": "编辑入口",
+			"delete": "删除入口",
+			"deleteConfirm": "确认删除“{{name}}”吗？",
+			"name": "名称",
+			"url": "网站地址",
+			"description": "说明",
+			"group": "分组",
+			"icon": "图标",
+			"color": "颜色",
+			"search": "搜索入口",
+			"allGroups": "全部分组",
+			"empty": "暂无入口，可以添加常用网站。",
+			"noMatches": "没有符合条件的入口。",
+			"loadError": "入口加载失败。",
+			"drag": "拖动调整入口顺序",
+			"sortHint": "请清空搜索和分组筛选后调整全部入口顺序。",
+			"sharedHint": "当前工作区成员均可访问，由所有者和管理员维护。",
+			"personalHint": "仅你本人可见和管理。",
+			"icons": {
+				"Globe": "网站",
+				"Building2": "业务系统",
+				"BookOpen": "知识库",
+				"Code": "开发",
+				"Mail": "邮件",
+				"Monitor": "运维",
+				"Folder": "文件",
+				"ChartColumn": "报表"
+			},
+			"colors": {
+				"blue": "蓝色",
+				"green": "绿色",
+				"orange": "橙色",
+				"purple": "紫色",
+				"slate": "灰色",
+				"rose": "玫红"
+			}
+		},
+		"updates": {
+			"title": "更新记录",
+			"subtitle": "查看平台的版本更新、功能改进和使用变化。",
+			"noticeTitle": "平台已更新",
+			"dismiss": "知道了",
+			"viewAll": "查看全部更新",
+			"unreadVersions": "{{count}} 个版本未读",
+			"more": "另有 {{count}} 项更新，可查看完整记录",
+			"loadError": "更新记录加载失败。",
+			"readError": "已读状态保存失败，请重试。"
 		}
 	},
 	"team": {

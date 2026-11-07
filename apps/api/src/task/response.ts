@@ -24,6 +24,7 @@ export const personalInsightTasksSchema = z
         updatedAt: responseTimestamp,
         actualEndAt: nullableResponseTimestamp,
         progress: z.number(),
+        collaboratorIds: z.array(z.string()).optional(),
         userId: z.string().nullable(),
         assigneeName: z.string(),
         assigneeImage: z.string().nullable(),
@@ -37,6 +38,7 @@ export const personalInsightTasksSchema = z
 
 export const taskSchema = z
   .object({
+    collaboratorIds: z.array(z.string()).optional(),
     id: z.string(),
     projectKind: z.enum(["project", "requirement"]).optional(),
     requirementData: requirementDataSchema.nullable().optional(),
@@ -173,6 +175,7 @@ export const boardTaskSchema = z
     position: z.number().nullable(),
     createdAt: responseTimestamp,
     updatedAt: responseTimestamp,
+    collaboratorIds: z.array(z.string()).optional(),
     userId: z.string().nullable(),
     assigneeName: z.string().nullable(),
     assigneeId: z.string().nullable(),
@@ -289,6 +292,7 @@ export const taskExportSchema = z
           priority: z.string(),
           dueDate: z.string().nullable().openapi({ format: "date-time" }),
           startDate: z.string().nullable().openapi({ format: "date-time" }),
+          collaboratorIds: z.array(z.string()).optional(),
           userId: z.string().nullable(),
           labels: z
             .array(
@@ -380,6 +384,7 @@ export const assignedTasksSchema = z
           projectIcon: z.string().nullable(),
           labels: z.array(taskLabelSchema),
         })
+        .extend({ involvement: z.enum(["owner", "collaborator"]).optional() })
         .openapi("AssignedTask"),
     ),
     total: z.number().openapi({

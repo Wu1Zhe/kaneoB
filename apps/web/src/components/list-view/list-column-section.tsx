@@ -67,7 +67,7 @@ const ListColumnSection = memo(function ListColumnSection({
   return (
     <div
       className={cn(
-        "border-b border-border/50 transition-colors duration-150 overflow-auto",
+        "border-b border-border/50 transition-colors duration-150 min-w-[calc(var(--task-column-title,0px)+var(--task-column-dueDate,96px)+var(--task-column-assignee,60px)+22rem)]",
         showDropIndicator && "border-l-4 border-l-ring bg-accent/35",
       )}
     >

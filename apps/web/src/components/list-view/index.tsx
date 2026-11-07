@@ -1,3 +1,6 @@
+import { TaskTableLayout } from "@/components/hierarchy-view/task-table-layout";
+import { TreeControls } from "@/components/hierarchy-view/tree-controls";
+import { ColumnResizeHandle } from "@/components/hierarchy-view/column-resize-handle";
 import { RequirementList } from "@/components/requirement/requirement-list";
 import {
   closestCorners,
@@ -62,10 +65,8 @@ function ListView({
   const { mutate: updateTask } = useUpdateTask();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overColumnId, setOverColumnId] = useState<string | null>(null);
-  const { isExpanded, toggleSection, toggleAllSections } = useCollapsedSections(
-    project.id,
-    "list",
-  );
+  const { isExpanded, toggleSection, toggleAllSections, expandAllSections } =
+    useCollapsedSections(project.id, "list");
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
@@ -403,7 +404,63 @@ function ListView({
       onDragCancel={handleDragCancel}
       modifiers={[snapCenterToCursor]}
     >
-      <div className="w-full h-full overflow-auto bg-muted/20">
+      <TaskTableLayout
+        projectId={project.id}
+        view="list"
+        className="flex w-full h-full min-h-0 flex-col overflow-auto bg-muted/20"
+      >
+        <TreeControls
+          disabled={relationsLoading || relationsFailed}
+          onExpand={() => {
+            expandAllSections();
+            const rows = project.columns.flatMap((column) =>
+              flattenSubtaskRows({
+                tasks: column.tasks,
+                children: subtaskChildren,
+                tasksById,
+                isExpanded: () => true,
+              }),
+            );
+            setExpanded({
+              projectId,
+              rows: Object.fromEntries(
+                rows
+                  .filter((row) => row.childCount > 0)
+                  .map((row) => [row.rowId, true]),
+              ),
+            });
+          }}
+          onCollapse={() => {
+            expandAllSections();
+            setExpanded({ projectId, rows: {} });
+          }}
+        />
+        <div className="flex h-8 min-w-[calc(var(--task-column-title,0px)+var(--task-column-dueDate,96px)+var(--task-column-assignee,60px)+22rem)] shrink-0 items-stretch border-b bg-background text-xs text-muted-foreground">
+          <span className="relative flex flex-1 items-center pl-10">
+            {t("tasks:hierarchy.columns.task")}
+            <ColumnResizeHandle
+              id="title"
+              defaultWidth={320}
+              label={t("tasks:hierarchy.columns.task")}
+            />
+          </span>
+          <span className="relative flex w-[var(--task-column-dueDate,96px)] shrink-0 items-center">
+            {t("tasks:hierarchy.columns.dueDate")}
+            <ColumnResizeHandle
+              id="dueDate"
+              defaultWidth={96}
+              label={t("tasks:hierarchy.columns.dueDate")}
+            />
+          </span>
+          <span className="relative flex w-[var(--task-column-assignee,60px)] shrink-0 items-center">
+            {t("tasks:hierarchy.columns.assignee")}
+            <ColumnResizeHandle
+              id="assignee"
+              defaultWidth={60}
+              label={t("tasks:hierarchy.columns.assignee")}
+            />
+          </span>
+        </div>
         {!isRequirement && relationsFailed && (
           // Without relations every task renders as a top-level row, which
           // reads exactly like a project with no subtasks; this says it isn't.
@@ -442,7 +499,7 @@ function ListView({
             />
           ))}
         </div>
-      </div>
+      </TaskTableLayout>
 
       <DragOverlay dropAnimation={reduceMotion ? null : undefined}>
         {activeTask && (

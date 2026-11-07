@@ -45,5 +45,9 @@ export function useCollapsedSections(
     [setCollapsed],
   );
 
-  return { isExpanded, toggleSection, toggleAllSections };
+  const expandAllSections = useCallback(
+    () => setCollapsed(NONE_COLLAPSED),
+    [setCollapsed],
+  );
+  return { isExpanded, toggleSection, toggleAllSections, expandAllSections };
 }

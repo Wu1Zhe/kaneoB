@@ -1,3 +1,4 @@
+import { validateParentLink } from "../parent";
 import { and, eq, inArray, or } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
@@ -44,7 +45,7 @@ async function createTaskRelation({
         ),
       )
       .orderBy(projectTable.id)
-      .for("share");
+      .for(relationType === "subtask" ? "update" : "share");
     const [sourceTask] = await tx
       .select({
         id: taskTable.id,
@@ -95,6 +96,29 @@ async function createTaskRelation({
       throw new HTTPException(400, {
         message: "Requirements cannot have subtasks or parents",
       });
+
+    if (relationType === "subtask") {
+      await validateParentLink(
+        tx,
+        sourceTaskId,
+        targetTaskId,
+        sourceTask.projectId,
+      );
+      const parents = await tx
+        .select({ id: taskRelationTable.id })
+        .from(taskRelationTable)
+        .where(
+          and(
+            eq(taskRelationTable.targetTaskId, targetTaskId),
+            eq(taskRelationTable.relationType, "subtask"),
+          ),
+        );
+      if (parents.length)
+        throw new HTTPException(409, {
+          message:
+            "Task already has a parent; use the parent selector to replace it",
+        });
+    }
 
     const existing = await tx
       .select({ id: taskRelationTable.id })

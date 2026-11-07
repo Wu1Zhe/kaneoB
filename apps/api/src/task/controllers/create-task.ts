@@ -1,9 +1,15 @@
 import {
+  normalizeCollaborators,
+  validateCollaborators,
+} from "../collaboration";
+import { setParentInTransaction } from "../../task-relation/parent";
+import { requirementAttachmentTable } from "../../database/schema";
+import {
   normalizeRequirementData,
   validateRequirementContent,
 } from "../requirement-rules";
 import { extractAssetIds } from "../../storage/cleanup-assets";
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, gt } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -75,10 +81,18 @@ async function createTask(
     customFields,
     draftAssetIds,
     requirementData,
+    expectedWorkspaceId,
+    collaboratorIds,
+    parentTaskId,
+    requirementAttachmentIds,
   }: {
     projectId: string;
+    expectedWorkspaceId?: string;
     currentUserId: string;
     userId?: string;
+    collaboratorIds?: string[];
+    parentTaskId?: string;
+    requirementAttachmentIds?: string[];
     title: string;
     status: string;
     startDate?: Date;
@@ -96,6 +110,8 @@ async function createTask(
   const container = await database.query.projectTable.findFirst({
     where: eq(projectTable.id, projectId),
   });
+  if (expectedWorkspaceId && container?.workspaceId !== expectedWorkspaceId)
+    throw new HTTPException(409, { message: "Project moved; reload" });
   if (container?.kind === "requirement")
     validateRequirementContent(title, description, requirementData?.type);
   const normalizedRequirementData =
@@ -115,7 +131,16 @@ async function createTask(
   const resolvedPriority = priority || "no-priority";
   const normalizedCustomFields = deduplicateCustomFields(customFields);
 
-  const normalizedUserId = userId?.trim() || undefined;
+  let normalizedUserId = userId?.trim() || undefined;
+  if (parentTaskId && container?.kind === "requirement")
+    throw new HTTPException(400, {
+      message: "Requirements cannot have parents",
+    });
+  const normalizedCollaborators = normalizeCollaborators(
+    collaboratorIds ?? [],
+    normalizedUserId ?? null,
+  );
+  await validateCollaborators(normalizedCollaborators, projectId);
 
   await assertValidTaskStatus(resolvedStatus, projectId);
 
@@ -194,6 +219,13 @@ async function createTask(
 
   const createdTask = await database.transaction(async (tx) => {
     const taskNumber = await claimTaskNumber(projectId, tx);
+    const lockedProject = await tx.query.projectTable.findFirst({
+      where: eq(projectTable.id, projectId),
+    });
+    if (!lockedProject || lockedProject.workspaceId !== container?.workspaceId)
+      throw new HTTPException(409, {
+        message: "Project moved; retry creation",
+      });
     const nextPosition = await nextTaskPosition(
       tx,
       projectId,
@@ -201,11 +233,35 @@ async function createTask(
       column?.id ?? null,
     );
 
+    if (parentTaskId && userId === undefined) {
+      const parent = await tx.query.taskTable.findFirst({
+        where: and(
+          eq(taskTable.id, parentTaskId),
+          eq(taskTable.projectId, projectId),
+        ),
+      });
+      if (!parent)
+        throw new HTTPException(400, {
+          message: "Parent task not found in this project",
+        });
+      normalizedUserId = parent.userId ?? undefined;
+      if (normalizedUserId)
+        await assertAssignableUser(
+          normalizedUserId,
+          await getProjectWorkspaceId(projectId, tx),
+          projectId,
+          tx,
+        );
+    }
     const [task] = await tx
       .insert(taskTable)
       .values({
         projectId,
         userId: normalizedUserId ?? null,
+        collaboratorIds: normalizeCollaborators(
+          normalizedCollaborators,
+          normalizedUserId ?? null,
+        ),
         createdBy: currentUserId,
         updatedBy: currentUserId,
         requirementData:
@@ -229,6 +285,37 @@ async function createTask(
         position: nextPosition,
       })
       .returning();
+
+    if (task && parentTaskId)
+      await setParentInTransaction(tx, task.id, parentTaskId, projectId);
+    if (task && requirementAttachmentIds?.length) {
+      if (container?.kind !== "requirement")
+        throw new HTTPException(400, {
+          message: "Excel attachments are for requirements",
+        });
+      const ids = [...new Set(requirementAttachmentIds)];
+      const claimed = await tx
+        .update(requirementAttachmentTable)
+        .set({ taskId: task.id })
+        .where(
+          and(
+            inArray(requirementAttachmentTable.id, ids),
+            eq(requirementAttachmentTable.projectId, projectId),
+            eq(requirementAttachmentTable.createdBy, currentUserId),
+            gt(
+              requirementAttachmentTable.createdAt,
+              new Date(Date.now() - 86400000),
+            ),
+            isNull(requirementAttachmentTable.taskId),
+          ),
+        )
+        .returning({ id: requirementAttachmentTable.id });
+      if (claimed.length !== ids.length)
+        throw new HTTPException(400, {
+          message:
+            "Some Excel attachments are unavailable or belong to another uploader",
+        });
+    }
 
     if (task && draftAssetIds?.length) {
       const referenced = extractAssetIds(description);
@@ -308,6 +395,11 @@ export async function publishTaskCreated(
     type: "created",
     content: null,
   });
+  if (createdTask.collaboratorIds.length)
+    await publishEvent("task.collaboration_changed", {
+      userIds: createdTask.collaboratorIds,
+      projectId: createdTask.projectId,
+    });
 }
 
 export default createTask;

@@ -1,3 +1,5 @@
+import { TaskCollaborators } from "../task-collaborators";
+import { TaskParent } from "../task-parent";
 import { RequirementProperties } from "@/components/requirement/requirement-properties";
 import { Calendar, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -65,7 +67,13 @@ export function PropertiesRail({
       <div className="flex flex-col gap-0.5">
         <TaskCreatorRow task={task} />
 
-        <PropertyRow label={t("tasks:assignee.label")}>
+        <PropertyRow
+          label={t(
+            isRequirement
+              ? "tasks:assignee.label"
+              : "tasks:collaboration.primary",
+          )}
+        >
           <TaskAssigneePopover task={task} workspaceId={workspaceId}>
             <PropertyValue data-task-action="assignee" shortcutId="assignTask">
               <AssigneeAvatar
@@ -87,6 +95,12 @@ export function PropertiesRail({
           </TaskAssigneePopover>
         </PropertyRow>
 
+        {!isRequirement && (
+          <>
+            <TaskCollaborators task={task} workspaceId={workspaceId} />
+            <TaskParent task={task} />
+          </>
+        )}
         {isRequirement ? (
           <>
             {(

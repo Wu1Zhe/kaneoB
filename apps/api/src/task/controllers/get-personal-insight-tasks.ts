@@ -1,3 +1,4 @@
+import { taskInvolves } from "../collaboration";
 import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
 import db from "../../database";
 import {
@@ -47,8 +48,9 @@ export default async function getPersonalInsightTasks(
       updatedAt: taskTable.updatedAt,
       actualEndAt: taskTable.actualEndAt,
       progress: taskTable.progress,
+      collaboratorIds: taskTable.collaboratorIds,
       userId: taskTable.userId,
-      assigneeName: userTable.name,
+      assigneeName: sql<string>`coalesce(${userTable.name}, '')`,
       assigneeImage: userTable.image,
       projectName: projectTable.name,
       projectSlug: projectTable.slug,
@@ -57,14 +59,14 @@ export default async function getPersonalInsightTasks(
     })
     .from(taskTable)
     .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
-    .innerJoin(userTable, eq(taskTable.userId, userTable.id))
+    .leftJoin(userTable, eq(taskTable.userId, userTable.id))
     .leftJoinLateral(statusColumn, sql`true`)
     .where(
       and(
         eq(projectTable.workspaceId, query.workspaceId),
         query.kind ? eq(projectTable.kind, query.kind) : undefined,
         isNull(projectTable.archivedAt),
-        eq(taskTable.userId, userId),
+        taskInvolves(userId),
         projectAccessCondition(userId, projectTable.id),
         query.after ? gt(taskTable.id, query.after) : undefined,
       ),

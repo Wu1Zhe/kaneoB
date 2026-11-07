@@ -1,10 +1,25 @@
 import { and, asc, inArray, isNull, lt, sql } from "drizzle-orm";
 import db from "../database";
-import { assetTable } from "../database/schema";
+import { requirementAttachmentTable, assetTable } from "../database/schema";
 import { queueStorageCleanup } from "../storage/cleanup-queue";
 
 export async function cleanupDraftUploads() {
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  await db.delete(requirementAttachmentTable).where(
+    inArray(
+      requirementAttachmentTable.id,
+      db
+        .select({ id: requirementAttachmentTable.id })
+        .from(requirementAttachmentTable)
+        .where(
+          and(
+            isNull(requirementAttachmentTable.taskId),
+            lt(requirementAttachmentTable.createdAt, cutoff),
+          ),
+        )
+        .limit(500),
+    ),
+  );
   const deadline = Date.now() + 60_000;
   do {
     const count = await db.transaction(async (tx) => {

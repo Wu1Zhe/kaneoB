@@ -126,7 +126,9 @@ it("blocks archive-all during pagination or errors, including an already-open co
   const { rerender } = render(<ListView project={project} />, {
     wrapper: Providers,
   });
-  fireEvent.click(screen.getByTitle(/archiveAllTooltip/));
+  fireEvent.click(
+    screen.getByTitle(/archiveAllTooltip|Archive all completed tasks/),
+  );
   const complete = {
     ...project,
     columns: [
@@ -137,9 +139,11 @@ it("blocks archive-all during pagination or errors, including an already-open co
     ],
   } as unknown as ProjectWithTasks;
   rerender(<ListView project={complete} disableCollectionActions />);
-  expect(screen.getByTitle(/archiveAllTooltip/).hasAttribute("disabled")).toBe(
-    true,
-  );
+  expect(
+    screen
+      .getByTitle(/archiveAllTooltip|Archive all completed tasks/)
+      .hasAttribute("disabled"),
+  ).toBe(true);
   expect(m.archive.disabled).toBe(true);
   act(() => m.archive.onConfirm?.());
   expect(m.mutate).not.toHaveBeenCalled();

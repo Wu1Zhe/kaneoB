@@ -1,3 +1,7 @@
+import portal from "./portal";
+import releases from "./releases";
+import requirementAttachments from "./requirement-attachments";
+import taskExtra from "./task-extra";
 import ideas from "./ideas";
 import reporting from "./reporting";
 import { requestActor } from "./utils/request-actor";
@@ -818,6 +822,13 @@ export function createApp() {
   const oauthApi = api.route("/oauth", oauth);
 
   const billingApi = api.route("/billing", billing);
+  const portalApi = api.route("/portal", portal);
+  const releasesApi = api.route("/releases", releases);
+  const requirementAttachmentsApi = api.route(
+    "/requirement-attachments",
+    requirementAttachments,
+  );
+  const taskExtraApi = api.route("/task-extra", taskExtra);
   const ideasApi = api.route("/ideas", ideas);
   const reportingApi = api.route("/reporting", reporting);
   const projectApi = api.route("/project", project);
@@ -1006,6 +1017,10 @@ export function createApp() {
     labelApi,
     notificationApi,
     notificationPreferencesApi,
+    portalApi,
+    releasesApi,
+    requirementAttachmentsApi,
+    taskExtraApi,
     ideasApi,
     reportingApi,
     projectApi,
@@ -1150,6 +1165,10 @@ const {
   mattermostIntegrationApi,
   notificationApi,
   notificationPreferencesApi,
+  portalApi,
+  releasesApi,
+  requirementAttachmentsApi,
+  taskExtraApi,
   ideasApi,
   reportingApi,
   projectApi,
@@ -1181,6 +1200,10 @@ if (isMainModule) {
 }
 
 export type AppType =
+  | typeof portalApi
+  | typeof releasesApi
+  | typeof requirementAttachmentsApi
+  | typeof taskExtraApi
   | typeof ideasApi
   | typeof reportingApi
   | typeof billingApi

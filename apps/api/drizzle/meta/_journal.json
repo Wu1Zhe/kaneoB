@@ -547,6 +547,13 @@
       "when": 1793524324522,
       "tag": "0077_legal_blazing_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1794020834985,
+      "tag": "0078_complete_shotgun",
+      "breakpoints": true
     }
   ]
 }

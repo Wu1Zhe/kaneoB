@@ -1,3 +1,4 @@
+import { ExcelAttachments } from "@/components/requirement/excel-attachments";
 import { RequirementContentFields } from "@/components/requirement/requirement-content-fields";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
@@ -107,6 +108,9 @@ export default function TaskDetailsContent({
       )}
 
       <div className="mt-6 flex flex-col gap-6">
+        {isRequirement && (
+          <ExcelAttachments projectId={projectId} taskId={taskId} />
+        )}
         {task && !isRequirement && (
           <TaskSubtasks
             taskId={taskId}

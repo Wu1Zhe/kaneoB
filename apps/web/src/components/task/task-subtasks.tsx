@@ -17,7 +17,6 @@ import CircularProgress from "@/components/ui/circular-progress";
 import { Input } from "@/components/ui/input";
 import useCreateTask from "@/hooks/mutations/task/use-create-task";
 import { useDeleteTask } from "@/hooks/mutations/task/use-delete-task";
-import useCreateTaskRelation from "@/hooks/mutations/task-relation/use-create-task-relation";
 import { useGetColumns } from "@/hooks/queries/column/use-get-columns";
 import useGetTaskRelations from "@/hooks/queries/task-relation/use-get-task-relations";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
@@ -61,7 +60,7 @@ export default function TaskSubtasks({
     workspace?.id ?? "",
   );
   const createTask = useCreateTask();
-  const createRelation = useCreateTaskRelation();
+
   const { mutateAsync: deleteTask } = useDeleteTask();
   const { data: columns = [], isLoading: isLoadingColumns } =
     useGetColumns(projectId);
@@ -244,18 +243,13 @@ export default function TaskSubtasks({
     if (!initialStatus) return;
 
     try {
-      const newTask = await createTask.mutateAsync({
+      await createTask.mutateAsync({
         title: newTitle.trim(),
         description: "",
         projectId,
         status: initialStatus,
         priority: "no-priority",
-      });
-
-      await createRelation.mutateAsync({
-        sourceTaskId: taskId,
-        targetTaskId: newTask.id,
-        relationType: "subtask",
+        parentTaskId: taskId,
       });
 
       setNewTitle("");

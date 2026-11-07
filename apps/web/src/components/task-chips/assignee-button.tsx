@@ -42,6 +42,19 @@ export function AssigneeButton({
           className={avatarClassName}
           fallbackClassName={avatarFallbackClassName}
         />
+        {Boolean(
+          task.collaboratorIds?.filter((id) => id !== task.userId).length,
+        ) && (
+          <span
+            className="absolute -bottom-1 -right-1 rounded-full bg-background px-0.5 text-[9px] leading-3 text-muted-foreground"
+            title={t("tasks:collaboration.count", {
+              count: task.collaboratorIds!.filter((id) => id !== task.userId)
+                .length,
+            })}
+          >
+            +{task.collaboratorIds!.filter((id) => id !== task.userId).length}
+          </span>
+        )}
       </button>
     </TaskAssigneePopover>
   );

@@ -299,6 +299,12 @@
             "type": "string",
             "format": "date-time"
           },
+          "collaboratorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "userId": {
             "type": [
               "string",
@@ -907,6 +913,198 @@
         },
         "required": [
           "idToken"
+        ]
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "collaboratorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "projectKind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "requirement"
+            ]
+          },
+          "requirementData": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "position": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Order within its column, ascending."
+          },
+          "number": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Per-project counter shown as {projectSlug}-{number}."
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The assignee, if any."
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "descriptionDeferred": {
+            "type": "boolean",
+            "description": "True when the list omits a large description; load the task detail or description pages to read it. Do not replace stored text with this null summary."
+          },
+          "status": {
+            "type": "string",
+            "description": "The slug of the column the task sits in."
+          },
+          "priority": {
+            "type": "string",
+            "description": "One of: no-priority, low, medium, high, urgent."
+          },
+          "progress": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Reported completion percentage, 0-100."
+          },
+          "weight": {
+            "type": "number",
+            "description": "Weight used when a parent task aggregates its subtasks' progress. Defaults to 1."
+          },
+          "updatedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updaterName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The user who created the task."
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "dueDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "actualStartAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When work actually started."
+          },
+          "actualEndAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When work actually finished."
+          },
+          "recurrence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskRecurrence"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customFields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fieldId": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fieldId",
+                "value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "position",
+          "number",
+          "userId",
+          "title",
+          "description",
+          "status",
+          "priority",
+          "progress",
+          "weight",
+          "createdBy",
+          "startDate",
+          "dueDate",
+          "actualStartAt",
+          "actualEndAt",
+          "createdAt"
         ]
       },
       "DashboardReport": {
@@ -1867,6 +2065,12 @@
                 "progress": {
                   "type": "number"
                 },
+                "collaboratorIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
                 "userId": {
                   "type": [
                     "string",
@@ -2013,6 +2217,13 @@
             "items": {
               "$ref": "#/components/schemas/TaskLabel"
             }
+          },
+          "involvement": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "collaborator"
+            ]
           }
         },
         "required": [
@@ -2100,192 +2311,6 @@
         "required": [
           "id",
           "url"
-        ]
-      },
-      "Task": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "projectKind": {
-            "type": "string",
-            "enum": [
-              "project",
-              "requirement"
-            ]
-          },
-          "requirementData": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "additionalProperties": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "projectId": {
-            "type": "string"
-          },
-          "position": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "description": "Order within its column, ascending."
-          },
-          "number": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "description": "Per-project counter shown as {projectSlug}-{number}."
-          },
-          "userId": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "The assignee, if any."
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "descriptionDeferred": {
-            "type": "boolean",
-            "description": "True when the list omits a large description; load the task detail or description pages to read it. Do not replace stored text with this null summary."
-          },
-          "status": {
-            "type": "string",
-            "description": "The slug of the column the task sits in."
-          },
-          "priority": {
-            "type": "string",
-            "description": "One of: no-priority, low, medium, high, urgent."
-          },
-          "progress": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 100,
-            "description": "Reported completion percentage, 0-100."
-          },
-          "weight": {
-            "type": "number",
-            "description": "Weight used when a parent task aggregates its subtasks' progress. Defaults to 1."
-          },
-          "updatedBy": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "updaterName": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "createdBy": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "The user who created the task."
-          },
-          "startDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "dueDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "actualStartAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time",
-            "description": "When work actually started."
-          },
-          "actualEndAt": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time",
-            "description": "When work actually finished."
-          },
-          "recurrence": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/TaskRecurrence"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "customFields": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "fieldId": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "fieldId",
-                "value"
-              ]
-            }
-          }
-        },
-        "required": [
-          "id",
-          "projectId",
-          "position",
-          "number",
-          "userId",
-          "title",
-          "description",
-          "status",
-          "priority",
-          "progress",
-          "weight",
-          "createdBy",
-          "startDate",
-          "dueDate",
-          "actualStartAt",
-          "actualEndAt",
-          "createdAt"
         ]
       },
       "TaskByTicketId": {
@@ -2488,6 +2513,12 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "collaboratorIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "userId": {
             "type": [
@@ -11296,6 +11327,1760 @@
         }
       }
     },
+    "/portal/{workspaceId}": {
+      "get": {
+        "operationId": "listPortal",
+        "tags": [
+          "Portal"
+        ],
+        "summary": "List workspace-shared or own personal website links",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "shared",
+                "personal"
+              ]
+            },
+            "required": true,
+            "name": "scope",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "url": {
+                        "type": "string",
+                        "maxLength": 2048
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "group": {
+                        "type": "string",
+                        "maxLength": 60,
+                        "default": ""
+                      },
+                      "icon": {
+                        "type": "string"
+                      },
+                      "color": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "ownerId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "workspaceId": {
+                        "type": "string"
+                      },
+                      "position": {
+                        "type": "number"
+                      },
+                      "version": {
+                        "type": "number"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url",
+                      "icon",
+                      "color",
+                      "id",
+                      "ownerId",
+                      "workspaceId",
+                      "position",
+                      "version",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid portal entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Portal changed; reload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPortalLink",
+        "tags": [
+          "Portal"
+        ],
+        "summary": "Create a website shortcut",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "shared",
+                      "personal"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "group": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "default": ""
+                  },
+                  "icon": {
+                    "type": "string",
+                    "enum": [
+                      "Globe",
+                      "Building2",
+                      "BookOpen",
+                      "Code",
+                      "Mail",
+                      "Monitor",
+                      "Folder",
+                      "ChartColumn"
+                    ],
+                    "default": "Globe"
+                  },
+                  "color": {
+                    "type": "string",
+                    "enum": [
+                      "blue",
+                      "green",
+                      "orange",
+                      "purple",
+                      "slate",
+                      "rose"
+                    ],
+                    "default": "blue"
+                  }
+                },
+                "required": [
+                  "scope",
+                  "name",
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "url": {
+                      "type": "string",
+                      "maxLength": 2048
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "default": ""
+                    },
+                    "group": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "default": ""
+                    },
+                    "icon": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "ownerId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "workspaceId": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "type": "number"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "url",
+                    "icon",
+                    "color",
+                    "id",
+                    "ownerId",
+                    "workspaceId",
+                    "position",
+                    "version",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid portal entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Portal changed; reload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/portal/{workspaceId}/{id}": {
+      "put": {
+        "operationId": "updatePortalLink",
+        "tags": [
+          "Portal"
+        ],
+        "summary": "Edit a shortcut with optimistic concurrency",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "shared",
+                      "personal"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "url": {
+                    "type": "string",
+                    "maxLength": 2048
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "default": ""
+                  },
+                  "group": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "default": ""
+                  },
+                  "icon": {
+                    "type": "string",
+                    "enum": [
+                      "Globe",
+                      "Building2",
+                      "BookOpen",
+                      "Code",
+                      "Mail",
+                      "Monitor",
+                      "Folder",
+                      "ChartColumn"
+                    ],
+                    "default": "Globe"
+                  },
+                  "color": {
+                    "type": "string",
+                    "enum": [
+                      "blue",
+                      "green",
+                      "orange",
+                      "purple",
+                      "slate",
+                      "rose"
+                    ],
+                    "default": "blue"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "scope",
+                  "name",
+                  "url",
+                  "version"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "url": {
+                      "type": "string",
+                      "maxLength": 2048
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "default": ""
+                    },
+                    "group": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "default": ""
+                    },
+                    "icon": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "ownerId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "workspaceId": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "type": "number"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "url",
+                    "icon",
+                    "color",
+                    "id",
+                    "ownerId",
+                    "workspaceId",
+                    "position",
+                    "version",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid portal entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Portal changed; reload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deletePortalLink",
+        "tags": [
+          "Portal"
+        ],
+        "summary": "Delete a shortcut in the authorized scope",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "shared",
+                      "personal"
+                    ]
+                  },
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "scope",
+                  "version"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid portal entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Portal changed; reload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/portal/{workspaceId}/reorder": {
+      "post": {
+        "operationId": "reorderPortalLinks",
+        "tags": [
+          "Portal"
+        ],
+        "summary": "Reorder every shortcut in a scope without losing concurrent edits",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "shared",
+                      "personal"
+                    ]
+                  },
+                  "entries": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "version"
+                      ]
+                    },
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "scope",
+                  "entries"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sorted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid portal entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Portal changed; reload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/releases": {
+      "get": {
+        "operationId": "getReleaseNotes",
+        "tags": [
+          "Releases"
+        ],
+        "summary": "Read platform update history and this account's read position",
+        "responses": {
+          "200": {
+            "description": "Updates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "notes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sequence": {
+                            "type": "number"
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "object",
+                            "properties": {
+                              "zh": {
+                                "type": "string"
+                              },
+                              "en": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "zh",
+                              "en"
+                            ]
+                          },
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "zh": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "en": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": [
+                              "zh",
+                              "en"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sequence",
+                          "version",
+                          "date",
+                          "title",
+                          "items"
+                        ]
+                      }
+                    },
+                    "lastReadSequence": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "notes",
+                    "lastReadSequence"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/releases/read": {
+      "post": {
+        "operationId": "acknowledgeReleaseNotes",
+        "tags": [
+          "Releases"
+        ],
+        "summary": "Mark a known release and all preceding releases read for this account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sequence": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "sequence"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acknowledged",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown release",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/requirement-attachments/{projectId}/draft": {
+      "post": {
+        "operationId": "uploadRequirementExcel",
+        "tags": [
+          "Requirements"
+        ],
+        "summary": "Stage a private Excel attachment for a new requirement, stored in the database",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "filename": {
+                      "type": "string"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "number"
+                    },
+                    "taskId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "filename",
+                    "mimeType",
+                    "size",
+                    "taskId"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Excel attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Project changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Excel file too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/requirement-attachments/{projectId}/task/{id}": {
+      "get": {
+        "operationId": "listRequirementAttachments",
+        "tags": [
+          "Requirements"
+        ],
+        "summary": "List a requirement's saved Excel attachments",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "filename": {
+                        "type": "string"
+                      },
+                      "mimeType": {
+                        "type": "string"
+                      },
+                      "size": {
+                        "type": "number"
+                      },
+                      "taskId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "filename",
+                      "mimeType",
+                      "size",
+                      "taskId"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Excel attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Project changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Excel file too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/requirement-attachments/{projectId}/file/{id}": {
+      "get": {
+        "operationId": "downloadRequirementAttachment",
+        "tags": [
+          "Requirements"
+        ],
+        "summary": "Download an authorized Excel attachment",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel attachment",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Excel attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Project changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Excel file too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteRequirementAttachment",
+        "tags": [
+          "Requirements"
+        ],
+        "summary": "Remove an Excel attachment or own staged upload",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Excel attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Project changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Excel file too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/task-extra/{id}/collaborators": {
+      "put": {
+        "operationId": "updateTaskCollaborators",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Replace task collaborators; the primary assignee remains separate",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "collaboratorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 50
+                  }
+                },
+                "required": [
+                  "collaboratorIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid assignment or parent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Task changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/task-extra/{id}/parent": {
+      "put": {
+        "operationId": "setTaskParent",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Set, replace or remove a task's single same-project parent",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parentTaskId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "parentTaskId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "parentTaskId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "parentTaskId"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid assignment or parent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Task changed; retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/ideas/{projectId}": {
       "get": {
         "tags": [
@@ -15345,6 +17130,29 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "collaboratorIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 50,
+                    "description": "Project members collaborating on delivery; separate from the primary assignee."
+                  },
+                  "parentTaskId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "One parent in the same project. If userId is omitted, the new child inherits its primary assignee."
+                  },
+                  "requirementAttachmentIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 20,
+                    "description": "This uploader's unexpired Excel draft IDs, claimed atomically when creating a requirement."
+                  },
                   "requirementData": {
                     "type": "object",
                     "additionalProperties": {
@@ -15382,7 +17190,7 @@
                   },
                   "userId": {
                     "type": "string",
-                    "description": "Assignee, if any."
+                    "description": "Primary assignee, if any. An explicit empty string keeps a child unassigned."
                   },
                   "recurrence": {
                     "allOf": [

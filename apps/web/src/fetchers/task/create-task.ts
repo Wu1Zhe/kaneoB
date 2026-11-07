@@ -20,6 +20,10 @@ async function createTask(
   draftAssetIds?: string[],
   recurrence?: CreateTaskRequest["recurrence"],
   requirementData?: CreateTaskRequest["requirementData"],
+  extra?: Pick<
+    CreateTaskRequest,
+    "collaboratorIds" | "parentTaskId" | "requirementAttachmentIds"
+  >,
 ) {
   if (!projectId) {
     throw new Error("No project selected for task creation");
@@ -27,9 +31,10 @@ async function createTask(
 
   const response = await client.task[":projectId"].$post({
     json: {
+      ...extra,
       title,
       description,
-      ...(userId ? { userId } : {}),
+      ...(userId !== undefined ? { userId } : {}),
       status,
       startDate: startDate?.toISOString() || undefined,
       dueDate: dueDate?.toISOString() || undefined,

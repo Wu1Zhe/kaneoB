@@ -84,6 +84,22 @@ export const bulkUpdateBody = z.object({
 });
 
 export const createTaskBody = z.object({
+  collaboratorIds: z.array(z.string().min(1)).max(50).optional().openapi({
+    description:
+      "Project members collaborating on delivery; separate from the primary assignee.",
+  }),
+  parentTaskId: z.string().min(1).optional().openapi({
+    description:
+      "One parent in the same project. If userId is omitted, the new child inherits its primary assignee.",
+  }),
+  requirementAttachmentIds: z
+    .array(z.string().min(1))
+    .max(20)
+    .optional()
+    .openapi({
+      description:
+        "This uploader's unexpired Excel draft IDs, claimed atomically when creating a requirement.",
+    }),
   requirementData: requirementDataSchema.optional(),
   title: z.string(),
   description: z.string(),
@@ -91,7 +107,10 @@ export const createTaskBody = z.object({
   dueDate: z.string().optional(),
   priority,
   status: z.string().openapi({ description: "The target column's slug." }),
-  userId: z.string().optional().openapi({ description: "Assignee, if any." }),
+  userId: z.string().optional().openapi({
+    description:
+      "Primary assignee, if any. An explicit empty string keeps a child unassigned.",
+  }),
   recurrence: taskRecurrenceSchema
     .optional()
     .openapi({ description: "Omit to create a task that does not repeat." }),

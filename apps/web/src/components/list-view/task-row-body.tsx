@@ -81,7 +81,7 @@ export function TaskRowBody({
         </span>
       )}
 
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+      <div className="flex min-w-[var(--task-column-title,0px)] flex-1 items-center gap-2">
         <span className="truncate text-foreground text-sm">{task.title}</span>
         {task.projectKind === "requirement" && (
           <RequirementNodeTimes task={task} />
@@ -132,19 +132,21 @@ export function TaskRowBody({
       </div>
 
       {showDueDates && (
-        <div className="flex w-24 shrink-0 justify-end">
+        <div className="flex w-[var(--task-column-dueDate,96px)] shrink-0 justify-end">
           <DueDateChip task={task} isCompleted={isCompleted} />
         </div>
       )}
 
       {showAssignees && (
-        <AssigneeButton
-          task={task}
-          workspaceId={workspaceId}
-          name={assigneeName}
-          image={assigneeImage}
-          avatarClassName="size-5.5 text-[9px]"
-        />
+        <div className="flex w-[var(--task-column-assignee,60px)] shrink-0 justify-end">
+          <AssigneeButton
+            task={task}
+            workspaceId={workspaceId}
+            name={assigneeName}
+            image={assigneeImage}
+            avatarClassName="size-5.5 text-[9px]"
+          />
+        </div>
       )}
     </>
   );

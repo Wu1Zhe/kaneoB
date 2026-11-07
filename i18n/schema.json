@@ -127,6 +127,9 @@
 						"cancel": {
 							"type": "string"
 						},
+						"save": {
+							"type": "string"
+						},
 						"close": {
 							"type": "string"
 						},
@@ -154,6 +157,7 @@
 					},
 					"required": [
 						"cancel",
+						"save",
 						"close",
 						"clearAll",
 						"delete",
@@ -846,6 +850,12 @@
 						"submitPassword": {
 							"type": "string"
 						},
+						"usePassword": {
+							"type": "string"
+						},
+						"useEmailCode": {
+							"type": "string"
+						},
 						"invitation": {
 							"type": "object",
 							"additionalProperties": false,
@@ -930,6 +940,8 @@
 						"instanceStatusError",
 						"heading",
 						"submitPassword",
+						"usePassword",
+						"useEmailCode",
 						"invitation",
 						"footer",
 						"autoLogin"
@@ -16661,6 +16673,157 @@
 						"finish",
 						"legacyMissing"
 					]
+				},
+				"collaboration": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"primary": {
+							"type": "string"
+						},
+						"add": {
+							"type": "string"
+						},
+						"search": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"myCollaboration": {
+							"type": "string"
+						},
+						"myResponsibility": {
+							"type": "string"
+						},
+						"count": {
+							"type": "string"
+						},
+						"count_zero": {
+							"type": "string"
+						},
+						"count_one": {
+							"type": "string"
+						},
+						"count_two": {
+							"type": "string"
+						},
+						"count_few": {
+							"type": "string"
+						},
+						"count_many": {
+							"type": "string"
+						},
+						"count_other": {
+							"type": "string"
+						},
+						"changed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"label",
+						"primary",
+						"add",
+						"search",
+						"hint",
+						"myCollaboration",
+						"myResponsibility",
+						"changed"
+					]
+				},
+				"parent": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"none": {
+							"type": "string"
+						},
+						"search": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"unavailable": {
+							"type": "string"
+						}
+					},
+					"required": ["label", "none", "search", "hint", "unavailable"]
+				},
+				"excel": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"upload": {
+							"type": "string"
+						},
+						"uploading": {
+							"type": "string"
+						},
+						"hint": {
+							"type": "string"
+						},
+						"invalid": {
+							"type": "string"
+						},
+						"tooMany": {
+							"type": "string"
+						},
+						"failed": {
+							"type": "string"
+						},
+						"remove": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"upload",
+						"uploading",
+						"hint",
+						"invalid",
+						"tooMany",
+						"failed",
+						"remove"
+					]
+				},
+				"table": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"expandAll": {
+							"type": "string"
+						},
+						"collapseAll": {
+							"type": "string"
+						},
+						"resetWidths": {
+							"type": "string"
+						},
+						"resize": {
+							"type": "string"
+						},
+						"resizeHint": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"expandAll",
+						"collapseAll",
+						"resetWidths",
+						"resize",
+						"resizeHint"
+					]
 				}
 			},
 			"required": [
@@ -16713,7 +16876,11 @@
 				"due",
 				"datePicker",
 				"insights",
-				"requirement"
+				"requirement",
+				"collaboration",
+				"parent",
+				"excel",
+				"table"
 			]
 		},
 		"invitations": {
@@ -17379,6 +17546,259 @@
 						}
 					},
 					"required": ["title", "description", "otherWorkspaces", "manage"]
+				},
+				"portal": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"shared": {
+							"type": "string"
+						},
+						"personal": {
+							"type": "string"
+						},
+						"add": {
+							"type": "string"
+						},
+						"manage": {
+							"type": "string"
+						},
+						"done": {
+							"type": "string"
+						},
+						"edit": {
+							"type": "string"
+						},
+						"delete": {
+							"type": "string"
+						},
+						"deleteConfirm": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"url": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"group": {
+							"type": "string"
+						},
+						"icon": {
+							"type": "string"
+						},
+						"color": {
+							"type": "string"
+						},
+						"search": {
+							"type": "string"
+						},
+						"allGroups": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"noMatches": {
+							"type": "string"
+						},
+						"loadError": {
+							"type": "string"
+						},
+						"drag": {
+							"type": "string"
+						},
+						"sortHint": {
+							"type": "string"
+						},
+						"sharedHint": {
+							"type": "string"
+						},
+						"personalHint": {
+							"type": "string"
+						},
+						"icons": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"Globe": {
+									"type": "string"
+								},
+								"Building2": {
+									"type": "string"
+								},
+								"BookOpen": {
+									"type": "string"
+								},
+								"Code": {
+									"type": "string"
+								},
+								"Mail": {
+									"type": "string"
+								},
+								"Monitor": {
+									"type": "string"
+								},
+								"Folder": {
+									"type": "string"
+								},
+								"ChartColumn": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"Globe",
+								"Building2",
+								"BookOpen",
+								"Code",
+								"Mail",
+								"Monitor",
+								"Folder",
+								"ChartColumn"
+							]
+						},
+						"colors": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"blue": {
+									"type": "string"
+								},
+								"green": {
+									"type": "string"
+								},
+								"orange": {
+									"type": "string"
+								},
+								"purple": {
+									"type": "string"
+								},
+								"slate": {
+									"type": "string"
+								},
+								"rose": {
+									"type": "string"
+								}
+							},
+							"required": ["blue", "green", "orange", "purple", "slate", "rose"]
+						}
+					},
+					"required": [
+						"title",
+						"subtitle",
+						"shared",
+						"personal",
+						"add",
+						"manage",
+						"done",
+						"edit",
+						"delete",
+						"deleteConfirm",
+						"name",
+						"url",
+						"description",
+						"group",
+						"icon",
+						"color",
+						"search",
+						"allGroups",
+						"empty",
+						"noMatches",
+						"loadError",
+						"drag",
+						"sortHint",
+						"sharedHint",
+						"personalHint",
+						"icons",
+						"colors"
+					]
+				},
+				"updates": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"noticeTitle": {
+							"type": "string"
+						},
+						"dismiss": {
+							"type": "string"
+						},
+						"viewAll": {
+							"type": "string"
+						},
+						"unreadVersions": {
+							"type": "string"
+						},
+						"unreadVersions_zero": {
+							"type": "string"
+						},
+						"unreadVersions_one": {
+							"type": "string"
+						},
+						"unreadVersions_two": {
+							"type": "string"
+						},
+						"unreadVersions_few": {
+							"type": "string"
+						},
+						"unreadVersions_many": {
+							"type": "string"
+						},
+						"unreadVersions_other": {
+							"type": "string"
+						},
+						"more": {
+							"type": "string"
+						},
+						"more_zero": {
+							"type": "string"
+						},
+						"more_one": {
+							"type": "string"
+						},
+						"more_two": {
+							"type": "string"
+						},
+						"more_few": {
+							"type": "string"
+						},
+						"more_many": {
+							"type": "string"
+						},
+						"more_other": {
+							"type": "string"
+						},
+						"loadError": {
+							"type": "string"
+						},
+						"readError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"subtitle",
+						"noticeTitle",
+						"dismiss",
+						"viewAll",
+						"loadError",
+						"readError"
+					]
 				}
 			},
 			"required": [
@@ -17388,7 +17808,9 @@
 				"home",
 				"myWork",
 				"myTasks",
-				"archived"
+				"archived",
+				"portal",
+				"updates"
 			]
 		},
 		"team": {

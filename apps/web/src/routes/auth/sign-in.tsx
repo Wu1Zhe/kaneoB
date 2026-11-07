@@ -75,9 +75,9 @@ function SignIn() {
   const baseUrl = import.meta.env.VITE_CLIENT_URL;
   const providers = getProviders(config);
   const defaultEmailMethod = getEmailMethod(config);
-  const [overrideMethod, setOverrideMethod] = useState<"code" | "password" | null>(
-    null,
-  );
+  const [overrideMethod, setOverrideMethod] = useState<
+    "code" | "password" | null
+  >(null);
   const emailMethod = overrideMethod ?? defaultEmailMethod;
   // Email code is the default when SMTP is configured; let people switch
   // between the code form and the email/password form on the same page.

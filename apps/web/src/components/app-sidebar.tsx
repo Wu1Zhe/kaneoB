@@ -1,3 +1,6 @@
+import { History } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import { useLocation } from "@tanstack/react-router";
 import type * as React from "react";
 import { useEffect } from "react";
@@ -19,6 +22,7 @@ import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setOpenMobile } = useSidebar();
+  const { t } = useTranslation();
   const pathname = useLocation({ select: (location) => location.pathname });
 
   // Navigation that doesn't start from a sidebar link (creating a project,
@@ -43,6 +47,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects kind="requirement" />
       </SidebarContent>
       <SidebarFooter>
+        <Link
+          to="/dashboard/updates"
+          className="flex h-8 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          <History className="size-4" />
+          {t("workspace:updates.title")}
+        </Link>
         <NavSecondary />
         <TrialCard />
         <div className="flex items-center justify-between">

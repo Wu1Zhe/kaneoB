@@ -33,6 +33,7 @@ import { Route as InvitationAcceptInviteIdRouteImport } from './routes/invitatio
 import { Route as LayoutAuthenticatedDashboardIndexRouteImport } from './routes/_layout/_authenticated/dashboard/index'
 import { Route as LayoutAuthenticatedDashboardInvitationsRouteImport } from './routes/_layout/_authenticated/dashboard/invitations'
 import { Route as LayoutAuthenticatedDashboardSettingsRouteImport } from './routes/_layout/_authenticated/dashboard/settings'
+import { Route as LayoutAuthenticatedDashboardUpdatesRouteImport } from './routes/_layout/_authenticated/dashboard/updates'
 import { Route as LayoutAuthenticatedDashboardSettingsAccountRouteImport } from './routes/_layout/_authenticated/dashboard/settings/account'
 import { Route as LayoutAuthenticatedDashboardSettingsAdminRouteImport } from './routes/_layout/_authenticated/dashboard/settings/admin'
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects'
@@ -206,6 +207,12 @@ const LayoutAuthenticatedDashboardSettingsRoute =
   LayoutAuthenticatedDashboardSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => LayoutAuthenticatedDashboardRoute,
+  } as any)
+const LayoutAuthenticatedDashboardUpdatesRoute =
+  LayoutAuthenticatedDashboardUpdatesRouteImport.update({
+    id: '/updates',
+    path: '/updates',
     getParentRoute: () => LayoutAuthenticatedDashboardRoute,
   } as any)
 const LayoutAuthenticatedDashboardSettingsAccountRoute =
@@ -563,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
   '/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
+  '/dashboard/updates': typeof LayoutAuthenticatedDashboardUpdatesRoute
   '/dashboard/': typeof LayoutAuthenticatedDashboardIndexRoute
   '/dashboard/settings/account': typeof LayoutAuthenticatedDashboardSettingsAccountRouteWithChildren
   '/dashboard/settings/admin': typeof LayoutAuthenticatedDashboardSettingsAdminRouteWithChildren
@@ -633,6 +641,7 @@ export interface FileRoutesByTo {
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
   '/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
+  '/dashboard/updates': typeof LayoutAuthenticatedDashboardUpdatesRoute
   '/dashboard': typeof LayoutAuthenticatedDashboardIndexRoute
   '/dashboard/settings/account': typeof LayoutAuthenticatedDashboardSettingsAccountRouteWithChildren
   '/dashboard/settings/projects': typeof LayoutAuthenticatedDashboardSettingsProjectsRouteWithChildren
@@ -705,6 +714,7 @@ export interface FileRoutesById {
   '/invitation/accept/$inviteId': typeof InvitationAcceptInviteIdRoute
   '/_layout/_authenticated/dashboard/invitations': typeof LayoutAuthenticatedDashboardInvitationsRoute
   '/_layout/_authenticated/dashboard/settings': typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
+  '/_layout/_authenticated/dashboard/updates': typeof LayoutAuthenticatedDashboardUpdatesRoute
   '/_layout/_authenticated/dashboard/': typeof LayoutAuthenticatedDashboardIndexRoute
   '/_layout/_authenticated/dashboard/settings/account': typeof LayoutAuthenticatedDashboardSettingsAccountRouteWithChildren
   '/_layout/_authenticated/dashboard/settings/admin': typeof LayoutAuthenticatedDashboardSettingsAdminRouteWithChildren
@@ -779,6 +789,7 @@ export interface FileRouteTypes {
     | '/invitation/accept/$inviteId'
     | '/dashboard/invitations'
     | '/dashboard/settings'
+    | '/dashboard/updates'
     | '/dashboard/'
     | '/dashboard/settings/account'
     | '/dashboard/settings/admin'
@@ -849,6 +860,7 @@ export interface FileRouteTypes {
     | '/invitation/accept/$inviteId'
     | '/dashboard/invitations'
     | '/dashboard/settings'
+    | '/dashboard/updates'
     | '/dashboard'
     | '/dashboard/settings/account'
     | '/dashboard/settings/projects'
@@ -920,6 +932,7 @@ export interface FileRouteTypes {
     | '/invitation/accept/$inviteId'
     | '/_layout/_authenticated/dashboard/invitations'
     | '/_layout/_authenticated/dashboard/settings'
+    | '/_layout/_authenticated/dashboard/updates'
     | '/_layout/_authenticated/dashboard/'
     | '/_layout/_authenticated/dashboard/settings/account'
     | '/_layout/_authenticated/dashboard/settings/admin'
@@ -1150,6 +1163,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardRoute
+    }
+    '/_layout/_authenticated/dashboard/updates': {
+      id: '/_layout/_authenticated/dashboard/updates'
+      path: '/updates'
+      fullPath: '/dashboard/updates'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardUpdatesRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardRoute
     }
     '/_layout/_authenticated/dashboard/settings/account': {
@@ -1713,6 +1733,7 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteWithChildren =
 interface LayoutAuthenticatedDashboardRouteChildren {
   LayoutAuthenticatedDashboardInvitationsRoute: typeof LayoutAuthenticatedDashboardInvitationsRoute
   LayoutAuthenticatedDashboardSettingsRoute: typeof LayoutAuthenticatedDashboardSettingsRouteWithChildren
+  LayoutAuthenticatedDashboardUpdatesRoute: typeof LayoutAuthenticatedDashboardUpdatesRoute
   LayoutAuthenticatedDashboardIndexRoute: typeof LayoutAuthenticatedDashboardIndexRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteWithChildren
   LayoutAuthenticatedDashboardWorkspaceCreateRoute: typeof LayoutAuthenticatedDashboardWorkspaceCreateRoute
@@ -1724,6 +1745,8 @@ const LayoutAuthenticatedDashboardRouteChildren: LayoutAuthenticatedDashboardRou
       LayoutAuthenticatedDashboardInvitationsRoute,
     LayoutAuthenticatedDashboardSettingsRoute:
       LayoutAuthenticatedDashboardSettingsRouteWithChildren,
+    LayoutAuthenticatedDashboardUpdatesRoute:
+      LayoutAuthenticatedDashboardUpdatesRoute,
     LayoutAuthenticatedDashboardIndexRoute:
       LayoutAuthenticatedDashboardIndexRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute:

@@ -1,3 +1,9 @@
+import { CollaboratorSelect } from "@/components/task/collaborator-select";
+import { ParentTaskSelect } from "@/components/task/parent-task-select";
+import {
+  ExcelAttachments,
+  type ExcelAttachment,
+} from "@/components/requirement/excel-attachments";
 import { useLocation, useParams } from "@tanstack/react-router";
 import { produce } from "immer";
 import {
@@ -243,6 +249,18 @@ function CreateTaskModalContent({
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<Priority>("no-priority");
   const [assigneeId, setAssigneeId] = useState("");
+  const [collaboratorIds, setCollaboratorIds] = useState<string[]>([]);
+  const [parentTaskId, setParentTaskId] = useState<string | null>(null);
+  const [inheritedAssignee, setInheritedAssignee] = useState<string | null>(
+    null,
+  );
+  const [excelFiles, setExcelFiles] = useState<ExcelAttachment[]>([]);
+  const [excelUploading, setExcelUploading] = useState(false);
+  useEffect(() => {
+    setCollaboratorIds((previous) =>
+      previous.filter((id) => id !== assigneeId),
+    );
+  }, [assigneeId]);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [recurrence, setRecurrence] = useState<TaskRecurrence | null>(null);
@@ -272,6 +290,13 @@ function CreateTaskModalContent({
   );
   const resolvedProjectId = resolvedProject?.id ?? "";
   const isRequirement = resolvedProject?.kind === "requirement";
+  useEffect(() => {
+    setParentTaskId(null);
+    setCollaboratorIds([]);
+    setExcelFiles([]);
+    setInheritedAssignee(null);
+    setExcelUploading(false);
+  }, [resolvedProjectId]);
   const { data: projectMembers } = useGetProjectMembers({
     workspaceId: workspace?.id || "",
     projectId: resolvedProjectId,
@@ -409,6 +434,9 @@ function CreateTaskModalContent({
     description.trim() ||
     priority !== "no-priority" ||
     assigneeId ||
+    parentTaskId ||
+    collaboratorIds.length ||
+    excelFiles.length ||
     startDate ||
     dueDate ||
     recurrence ||
@@ -530,6 +558,7 @@ function CreateTaskModalContent({
       !activeRef.current ||
       submittingRef.current ||
       pendingUploadsRef.current > 0 ||
+      excelUploading ||
       !canCreateTaskCapability ||
       awaitingColumns ||
       !title.trim() ||
@@ -576,6 +605,11 @@ function CreateTaskModalContent({
       const savedTask = normalizeTask(
         await createTask({
           title: title.trim(),
+          collaboratorIds: isRequirement ? [] : collaboratorIds,
+          parentTaskId: isRequirement ? undefined : (parentTaskId ?? undefined),
+          requirementAttachmentIds: isRequirement
+            ? excelFiles.map((file) => file.id)
+            : [],
           ...(isRequirement
             ? {
                 requirementData: {
@@ -637,6 +671,10 @@ function CreateTaskModalContent({
         setDescription("");
         setPriority("no-priority");
         setAssigneeId("");
+        setParentTaskId(null);
+        setCollaboratorIds([]);
+        setExcelFiles([]);
+        setInheritedAssignee(null);
         setStartDate(undefined);
         setDueDate(undefined);
         setRecurrence(null);
@@ -897,6 +935,46 @@ function CreateTaskModalContent({
               />
             </div>
 
+            {isRequirement ? (
+              <ExcelAttachments
+                key={resolvedProjectId}
+                projectId={resolvedProjectId}
+                disabled={isSubmitting}
+                value={excelFiles}
+                onChange={setExcelFiles}
+                onUploadingChange={setExcelUploading}
+              />
+            ) : (
+              <div className="my-4 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("tasks:parent.label")}
+                  </p>
+                  <ParentTaskSelect
+                    projectId={resolvedProjectId}
+                    value={parentTaskId}
+                    onChange={(id, owner) => {
+                      setParentTaskId(id);
+                      if (!assigneeId || assigneeId === inheritedAssignee)
+                        setAssigneeId(owner ?? "");
+                      setInheritedAssignee(owner);
+                    }}
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("tasks:collaboration.label")}
+                  </p>
+                  <CollaboratorSelect
+                    projectId={resolvedProjectId}
+                    workspaceId={workspace?.id ?? ""}
+                    ownerId={assigneeId || null}
+                    value={collaboratorIds}
+                    onChange={setCollaboratorIds}
+                  />
+                </div>
+              </div>
+            )}
             {labels.length > 0 && (
               <div className="flex flex-wrap mb-2">
                 {labels.map((label) => (
@@ -1390,7 +1468,8 @@ function CreateTaskModalContent({
                 assigneeUnconfirmed ||
                 isSubmitting ||
                 awaitingColumns ||
-                isPreparingDraft
+                isPreparingDraft ||
+                excelUploading
               }
               aria-busy={isPreparingDraft || isSubmitting}
               size="sm"

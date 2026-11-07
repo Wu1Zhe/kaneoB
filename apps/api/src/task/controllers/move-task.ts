@@ -1,9 +1,11 @@
-import { and, asc, eq, isNotNull, notInArray } from "drizzle-orm";
+import { and, asc, eq, isNotNull, notInArray, or } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import createActivities from "../../activity/controllers/create-activities";
 import db from "../../database";
 import {
   assetTable,
+  requirementAttachmentTable,
+  taskRelationTable,
   columnTable,
   externalLinkTable,
   integrationTable,
@@ -111,6 +113,11 @@ async function moveTask({
     });
   }
 
+  if (sourceProject.kind !== destinationProject.kind)
+    throw new HTTPException(400, {
+      message:
+        "Tasks and requirements cannot be moved between different project types",
+    });
   await assertProjectAccess(currentUserId, destinationProjectId);
 
   const resolvedColumn = await resolveDestinationStatus(
@@ -167,7 +174,36 @@ async function moveTask({
       });
     }
 
-    let movedTask = updatedTask;
+    const allowedCollaborators = await filterUsersWithProjectAccess(
+      updatedTask.collaboratorIds,
+      destinationProjectId,
+      tx,
+    );
+    const [collaborationUpdated] = await tx
+      .update(taskTable)
+      .set({
+        collaboratorIds: updatedTask.collaboratorIds.filter((id) =>
+          allowedCollaborators.has(id),
+        ),
+      })
+      .where(eq(taskTable.id, taskId))
+      .returning();
+    await tx
+      .update(requirementAttachmentTable)
+      .set({ projectId: destinationProjectId })
+      .where(eq(requirementAttachmentTable.taskId, taskId));
+    await tx
+      .delete(taskRelationTable)
+      .where(
+        and(
+          eq(taskRelationTable.relationType, "subtask"),
+          or(
+            eq(taskRelationTable.sourceTaskId, taskId),
+            eq(taskRelationTable.targetTaskId, taskId),
+          ),
+        ),
+      );
+    let movedTask = collaborationUpdated ?? updatedTask;
     const assigneeId = updatedTask.userId;
     if (
       assigneeId &&

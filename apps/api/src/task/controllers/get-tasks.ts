@@ -209,6 +209,9 @@ async function getTasksPage(
     position: taskTable.position,
     createdAt: taskTable.createdAt,
     updatedAt: taskTable.updatedAt,
+    collaboratorIds: options.publicOnly
+      ? sql<string[]>`'[]'::jsonb`
+      : taskTable.collaboratorIds,
     userId: taskTable.userId,
     createdBy: taskTable.createdBy,
     updatedBy: options.publicOnly ? sql<null>`null` : taskTable.updatedBy,

@@ -22,6 +22,9 @@ function useCreateTask() {
       draftAssetIds,
       recurrence,
       requirementData,
+      collaboratorIds,
+      parentTaskId,
+      requirementAttachmentIds,
     }: CreateTaskRequest) =>
       createTask(
         title,
@@ -36,9 +39,15 @@ function useCreateTask() {
         draftAssetIds,
         recurrence,
         requirementData,
+        { collaboratorIds, parentTaskId, requirementAttachmentIds },
       ),
     onSuccess: (_data, variables) => {
       invalidateMyWork(queryClient);
+      if (variables.parentTaskId)
+        void queryClient.invalidateQueries({
+          predicate: (query) =>
+            String(query.queryKey[0]).toLowerCase().includes("relation"),
+        });
       void queryClient.invalidateQueries({ queryKey: ["projects"] });
       trackFirstTask();
       void queryClient.invalidateQueries({

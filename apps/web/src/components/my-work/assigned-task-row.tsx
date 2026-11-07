@@ -42,6 +42,15 @@ export function AssignedTaskRow({
           )}
         </span>
       )}
+      {task.involvement && (
+        <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          {t(
+            task.involvement === "collaborator"
+              ? "tasks:collaboration.myCollaboration"
+              : "tasks:collaboration.myResponsibility",
+          )}
+        </span>
+      )}
       <span className="flex w-4 shrink-0 justify-center [&_svg]:size-3.5">
         {getPriorityIcon(task.priority)}
       </span>

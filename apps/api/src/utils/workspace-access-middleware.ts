@@ -86,7 +86,10 @@ export function workspaceAccessMiddleware(
       } else if (source.type === "param") {
         workspaceId = c.req.param(source.key) || null;
       } else if (source.type === "lookup") {
-        const body = await readJsonObjectBody(c);
+        // A path-scoped upload must retain its multipart body for the validator.
+        const body = c.req.param(source.idKey)
+          ? {}
+          : await readJsonObjectBody(c);
         const bodyId = body[source.idKey];
         const idFromBody = typeof bodyId === "string" ? bodyId : null;
         // Only accept the id from the same place the handler will read it

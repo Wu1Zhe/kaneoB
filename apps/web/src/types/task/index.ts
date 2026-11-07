@@ -47,6 +47,7 @@ type Task = {
   position: number | null;
   createdAt: string;
   updatedAt?: string;
+  collaboratorIds?: string[];
   userId: string | null;
   assigneeId: string | null;
   assigneeName: string | null;

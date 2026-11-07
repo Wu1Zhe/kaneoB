@@ -714,6 +714,10 @@ export const taskTable = pgTable(
       onDelete: "set null",
       onUpdate: "cascade",
     }),
+    collaboratorIds: jsonb("collaborator_ids")
+      .$type<string[]>()
+      .notNull()
+      .default([]),
     createdBy: text("created_by").references(() => userTable.id, {
       onDelete: "set null",
       onUpdate: "cascade",
@@ -755,6 +759,7 @@ export const taskTable = pgTable(
       ),
     index("task_dueDate_idx").on(table.dueDate),
     index("task_assigneeId_idx").on(table.userId),
+    index("task_collaborators_idx").using("gin", table.collaboratorIds),
     index("task_columnId_idx").on(table.columnId),
     unique("task_project_number_unique").on(table.projectId, table.number),
   ],
@@ -1766,5 +1771,82 @@ export const ideaTable = pgTable(
   },
   (table) => [
     index("idea_project_updated_idx").on(table.projectId, table.updatedAt),
+  ],
+);
+
+export const portalLinkTable = pgTable(
+  "portal_link",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, { onDelete: "cascade" }),
+    ownerId: text("owner_id").references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    description: text("description").notNull().default(""),
+    group: text("group_name").notNull().default(""),
+    icon: text("icon").notNull().default("Globe"),
+    color: text("color").notNull().default("blue"),
+    position: integer("position").notNull().default(0),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .notNull()
+      .default(utcNow),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .notNull()
+      .default(utcNow)
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("portal_link_scope_idx").on(
+      table.workspaceId,
+      table.ownerId,
+      table.position,
+    ),
+  ],
+);
+
+export const releaseReadTable = pgTable("release_read", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => userTable.id, { onDelete: "cascade" }),
+  releaseSequence: integer("release_sequence").notNull().default(0),
+  readAt: timestamp("read_at", { mode: "date" }).notNull().default(utcNow),
+});
+
+export const requirementAttachmentTable = pgTable(
+  "requirement_attachment",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, { onDelete: "cascade" }),
+    taskId: text("task_id").references(() => taskTable.id, {
+      onDelete: "cascade",
+    }),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    filename: text("filename").notNull(),
+    mimeType: text("mime_type").notNull(),
+    size: integer("size").notNull(),
+    data: bytea("data").notNull(),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .notNull()
+      .default(utcNow),
+  },
+  (table) => [
+    index("requirement_attachment_task_idx").on(table.taskId),
+    index("requirement_attachment_draft_idx").on(
+      table.createdBy,
+      table.createdAt,
+    ),
   ],
 );

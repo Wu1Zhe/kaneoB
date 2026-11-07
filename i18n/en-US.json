@@ -30,6 +30,7 @@
 		"appName": "Kaneo",
 		"actions": {
 			"cancel": "Cancel",
+			"save": "Save",
 			"close": "Close",
 			"clearAll": "Clear all",
 			"delete": "Delete",
@@ -3991,6 +3992,41 @@
 			"start": "Start",
 			"finish": "Finish",
 			"legacyMissing": "Required type missing. Existing content is preserved; complete the missing field."
+		},
+		"collaboration": {
+			"label": "Collaborators",
+			"primary": "Primary assignee",
+			"add": "Add collaborators",
+			"search": "Search project members",
+			"hint": "Collaborators see this task in My tasks. The primary assignee owns delivery.",
+			"myCollaboration": "Collaborating",
+			"myResponsibility": "Responsible",
+			"count": "{{count}} collaborators",
+			"changed": "updated the task collaborators"
+		},
+		"parent": {
+			"label": "Parent task",
+			"none": "No parent task",
+			"search": "Search task number or title",
+			"hint": "One parent within this project. Descendants cannot be selected.",
+			"unavailable": "Parent task unavailable"
+		},
+		"excel": {
+			"title": "Excel attachments",
+			"upload": "Upload Excel",
+			"uploading": "Uploading…",
+			"hint": ".xlsx / .xls, up to 10 MiB each, 20 files. Attachments are included in database backups.",
+			"invalid": "Choose a non-empty .xlsx or .xls file up to 10 MiB.",
+			"tooMany": "At most 20 Excel attachments are allowed.",
+			"failed": "Unable to load or save the attachment.",
+			"remove": "Remove {{name}}"
+		},
+		"table": {
+			"expandAll": "Expand all",
+			"collapseAll": "Collapse all",
+			"resetWidths": "Reset column widths",
+			"resize": "Resize column",
+			"resizeHint": "Drag or use arrow keys to resize; double-click to reset"
 		}
 	},
 	"invitations": {
@@ -4155,6 +4191,62 @@
 			"description": "Contact an administrator to restore access.",
 			"otherWorkspaces": "Go to workspaces",
 			"manage": "Manage workspaces"
+		},
+		"portal": {
+			"title": "Portal · Shortcuts",
+			"subtitle": "Open your shared systems and personal websites in a new tab.",
+			"shared": "Shared links",
+			"personal": "My links",
+			"add": "Add link",
+			"manage": "Manage",
+			"done": "Done",
+			"edit": "Edit link",
+			"delete": "Delete link",
+			"deleteConfirm": "Delete “{{name}}”?",
+			"name": "Name",
+			"url": "Website URL",
+			"description": "Description",
+			"group": "Group",
+			"icon": "Icon",
+			"color": "Color",
+			"search": "Search links",
+			"allGroups": "All groups",
+			"empty": "No shortcuts yet.",
+			"noMatches": "No matching shortcuts.",
+			"loadError": "Unable to load shortcuts.",
+			"drag": "Drag to reorder shortcut",
+			"sortHint": "Clear search and group filters to reorder all links.",
+			"sharedHint": "Visible to this workspace. Owners and administrators manage shared links.",
+			"personalHint": "Only your account can view and manage this link.",
+			"icons": {
+				"Globe": "Website",
+				"Building2": "Business system",
+				"BookOpen": "Knowledge base",
+				"Code": "Development",
+				"Mail": "Mail",
+				"Monitor": "Operations",
+				"Folder": "Files",
+				"ChartColumn": "Reports"
+			},
+			"colors": {
+				"blue": "Blue",
+				"green": "Green",
+				"orange": "Orange",
+				"purple": "Purple",
+				"slate": "Slate",
+				"rose": "Rose"
+			}
+		},
+		"updates": {
+			"title": "Update history",
+			"subtitle": "Platform releases, improvements and new features.",
+			"noticeTitle": "The platform has been updated",
+			"dismiss": "Got it",
+			"viewAll": "View all updates",
+			"unreadVersions": "{{count}} unread releases",
+			"more": "{{count}} more updates in the release history",
+			"loadError": "Unable to load update history.",
+			"readError": "Could not save your read status. Please retry."
 		}
 	},
 	"team": {

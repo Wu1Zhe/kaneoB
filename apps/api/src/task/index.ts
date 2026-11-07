@@ -1,3 +1,4 @@
+import type { Context } from "hono";
 import { withVerifiedStorageObject } from "../storage/cleanup-queue";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -321,6 +322,14 @@ const createTaskRoute = createRoute({
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["create"] }),
+    async (c, next) => {
+      const raw = await c.req.json().catch(() => ({}));
+      const body =
+        raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+      if (body.userId || body.collaboratorIds?.length || body.parentTaskId)
+        return requireWorkspacePermission({ task: ["assign"] })(c, next);
+      return next();
+    },
     requireEntitlement,
   ] as const,
   request: {
@@ -1036,6 +1045,9 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       customFields,
       draftAssetIds,
       requirementData,
+      collaboratorIds,
+      parentTaskId,
+      requirementAttachmentIds,
     } = c.req.valid("json");
 
     const parsedStartDate =
@@ -1052,6 +1064,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     const task = await createTask({
       projectId,
       currentUserId: c.get("userId"),
+      expectedWorkspaceId: (c as Context).get("workspaceId") as string,
       userId: userId,
       title,
       description,
@@ -1063,6 +1076,9 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       customFields,
       draftAssetIds,
       requirementData,
+      collaboratorIds,
+      parentTaskId,
+      requirementAttachmentIds,
     });
 
     return c.json(task, 200);
